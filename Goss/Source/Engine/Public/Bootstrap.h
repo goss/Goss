@@ -1,9 +1,9 @@
 #pragma once
 
+#include "ApplicationWindow.h"
 #include "EngineDevice.h"
 #include "Pipeline.h"
 #include "SwapChain.h"
-#include "ApplicationWindow.h"
 
 // std
 #include <memory>

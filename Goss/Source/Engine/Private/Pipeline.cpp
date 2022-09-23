@@ -20,6 +20,9 @@ namespace Goss
 		vkDestroyShaderModule(device, vertShaderModule, nullptr);
 		vkDestroyShaderModule(device, fragShaderModule, nullptr);
 		vkDestroyPipeline(device, graphicsPipeline, nullptr);
+
+		vertShaderModule = VK_NULL_HANDLE;
+		fragShaderModule = VK_NULL_HANDLE;
 	}
 
 	void Pipeline::Bind(const VkCommandBuffer commandBuffer) const
@@ -43,12 +46,6 @@ namespace Goss
 
 		configInfo.scissor.offset = {0, 0};
 		configInfo.scissor.extent = {width, height};
-
-		configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		configInfo.viewportInfo.viewportCount = 1;
-		configInfo.viewportInfo.pViewports = &configInfo.viewport;
-		configInfo.viewportInfo.scissorCount = 1;
-		configInfo.viewportInfo.pScissors = &configInfo.scissor;
 
 		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -105,7 +102,8 @@ namespace Goss
 
 	std::vector<char> Pipeline::ReadFile(const char* filepath)
 	{
-		if(std::ifstream file(filepath, std::ios::ate, std::ios::binary); file.is_open())
+		std::ifstream file = std::ifstream(filepath, std::ios::ate | std::ios::binary);
+		if(file.is_open())
 		{
 			const std::streamsize fileSize = file.tellg();
 			std::vector<char> buffer(fileSize);
@@ -132,7 +130,7 @@ namespace Goss
 		CreateShaderModule(vertCode, &vertShaderModule);
 		CreateShaderModule(fragCode, &fragShaderModule);
 
-		VkPipelineShaderStageCreateInfo shaderStages[2];
+		VkPipelineShaderStageCreateInfo shaderStages[2]{};
 		shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
 		shaderStages[0].module = vertShaderModule;
@@ -147,12 +145,28 @@ namespace Goss
 		shaderStages[1].flags = 0;
 		shaderStages[1].pSpecializationInfo = nullptr;
 
+		//auto& bindingDescriptions = configInfo.bindingDescriptions;
+		//auto& attributeDescriptions = configInfo.attributeDescriptions;
+		//VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+		//vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		//vertexInputInfo.vertexAttributeDescriptionCount =static_cast<uint32_t>(attributeDescriptions.size());
+		//vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+		//vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+		//vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+
 		VkPipelineVertexInputStateCreateInfo vertexInputState{};
 		vertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 		vertexInputState.vertexAttributeDescriptionCount = 0;
 		vertexInputState.vertexBindingDescriptionCount = 0;
 		vertexInputState.pVertexAttributeDescriptions = nullptr;
 		vertexInputState.pVertexBindingDescriptions = nullptr;
+
+		VkPipelineViewportStateCreateInfo viewportInfo{};
+		viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		viewportInfo.viewportCount = 1;
+		viewportInfo.pViewports = &configInfo.viewport;
+		viewportInfo.scissorCount = 1;
+		viewportInfo.pScissors = &configInfo.scissor;
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -161,7 +175,7 @@ namespace Goss
 		pipelineInfo.pVertexInputState = &vertexInputState;
 		pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
 		pipelineInfo.pMultisampleState = &configInfo.multiSampleInfo;
-		pipelineInfo.pViewportState = &configInfo.viewportInfo;
+		pipelineInfo.pViewportState = &viewportInfo; //&configInfo.viewportInfo
 		pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
 		pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
 		pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
@@ -191,5 +205,17 @@ namespace Goss
 		{
 			throw std::runtime_error("Failed to create shader module");
 		}
+	}
+
+	void Pipeline::EnableAlphaBlending(PipelineConfigInfo& configInfo)
+	{
+		configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
+		configInfo.colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+		configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+		configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
 	}
 }

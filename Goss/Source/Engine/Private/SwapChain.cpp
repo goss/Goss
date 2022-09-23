@@ -34,7 +34,8 @@ namespace Goss
 			swapChain = nullptr;
 		}
 
-		for (int i = 0; i < depthImages.size(); i++)
+		const int size = static_cast<int>(depthImages.size());
+		for (int i = 0; i < size; i++)
 		{
 			vkDestroyImageView(device.Device(), depthImageViews[i], nullptr);
 			vkDestroyImage(device.Device(), depthImages[i], nullptr);
@@ -59,20 +60,11 @@ namespace Goss
 
 	VkResult SwapChain::AcquireNextImage(uint32_t* imageIndex) const
 	{
-		vkWaitForFences(
-			device.Device(),
-			1,
-			&inFlightFences[currentFrame],
-			VK_TRUE,
-			std::numeric_limits<uint64_t>::max());
+		vkWaitForFences(device.Device(),1, &inFlightFences[currentFrame],VK_TRUE,std::numeric_limits<uint64_t>::max());
 
-		const VkResult result = vkAcquireNextImageKHR(
-			device.Device(),
-			swapChain,
-			std::numeric_limits<uint64_t>::max(),
-			imageAvailableSemaphores[currentFrame], // must be a not signaled semaphore
-			VK_NULL_HANDLE,
-			imageIndex);
+		const VkResult result = vkAcquireNextImageKHR(device.Device(), swapChain,
+			std::numeric_limits<uint64_t>::max(),imageAvailableSemaphores[currentFrame], // must be a not signaled semaphore
+			VK_NULL_HANDLE, imageIndex);
 
 		return result;
 	}
@@ -102,8 +94,7 @@ namespace Goss
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
 		vkResetFences(device.Device(), 1, &inFlightFences[currentFrame]);
-		if (vkQueueSubmit(device.GraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
-			VK_SUCCESS)
+		if (vkQueueSubmit(device.GraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to submit draw command buffer!");
 		}
@@ -130,14 +121,13 @@ namespace Goss
 	void SwapChain::CreateSwapChain()
 	{
 		const SwapChainSupportDetails swapChainSupport = device.GetSwapChainSupport();
-
 		const VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
 		const VkPresentModeKHR presentMode = ChooseSwapPresentMode(swapChainSupport.presentModes);
 		const VkExtent2D extent = ChooseSwapExtent(swapChainSupport.capabilities);
 
 		uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-		if (swapChainSupport.capabilities.maxImageCount > 0 &&
-			imageCount > swapChainSupport.capabilities.maxImageCount)
+
+		if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount)
 		{
 			imageCount = swapChainSupport.capabilities.maxImageCount;
 		}
@@ -145,7 +135,6 @@ namespace Goss
 		VkSwapchainCreateInfoKHR createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
 		createInfo.surface = device.Surface();
-
 		createInfo.minImageCount = imageCount;
 		createInfo.imageFormat = surfaceFormat.format;
 		createInfo.imageColorSpace = surfaceFormat.colorSpace;
@@ -171,10 +160,8 @@ namespace Goss
 
 		createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
-
 		createInfo.oldSwapchain = VK_NULL_HANDLE;
 
 		if (vkCreateSwapchainKHR(device.Device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
@@ -295,11 +282,7 @@ namespace Goss
 			framebufferCreateInfo.height = chainExtent.height;
 			framebufferCreateInfo.layers = 1;
 
-			if (vkCreateFramebuffer(
-				device.Device(),
-				&framebufferCreateInfo,
-				nullptr,
-				&swapChainFrameBuffers[i]) != VK_SUCCESS)
+			if (vkCreateFramebuffer(device.Device(), &framebufferCreateInfo,nullptr, &swapChainFrameBuffers[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to create framebuffer!");
 			}
@@ -334,11 +317,7 @@ namespace Goss
 			imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 			imageInfo.flags = 0;
 
-			device.CreateImageWithInfo(
-				imageInfo,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-				depthImages[i],
-				depthImageMemory[i]);
+			device.CreateImageWithInfo(imageInfo,VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,depthImages[i],depthImageMemory[i]);
 
 			VkImageViewCreateInfo viewInfo{};
 			viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -374,10 +353,8 @@ namespace Goss
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
-			if (vkCreateSemaphore(device.Device(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) !=
-				VK_SUCCESS ||
-				vkCreateSemaphore(device.Device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) !=
-				VK_SUCCESS ||
+			if (vkCreateSemaphore(device.Device(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+				vkCreateSemaphore(device.Device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
 				vkCreateFence(device.Device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to create synchronization objects for a frame!");
@@ -427,22 +404,18 @@ namespace Goss
 		{
 			return capabilities.currentExtent;
 		}
+
 		VkExtent2D actualExtent = windowExtent;
-		actualExtent.width = std::max(
-			capabilities.minImageExtent.width,
-			std::min(capabilities.maxImageExtent.width, actualExtent.width));
-		actualExtent.height = std::max(
-			capabilities.minImageExtent.height,
-			std::min(capabilities.maxImageExtent.height, actualExtent.height));
+		actualExtent.width = std::max(capabilities.minImageExtent.width,std::min(capabilities.maxImageExtent.width, actualExtent.width));
+		actualExtent.height = std::max(capabilities.minImageExtent.height,std::min(capabilities.maxImageExtent.height, actualExtent.height));
 
 		return actualExtent;
 	}
 
 	VkFormat SwapChain::FindDepthFormat() const
 	{
-		return device.FindSupportedFormat(
-			{VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
-			VK_IMAGE_TILING_OPTIMAL,
-			VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
+		return device.FindSupportedFormat({VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
+											VK_IMAGE_TILING_OPTIMAL,
+									VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 	}
 }

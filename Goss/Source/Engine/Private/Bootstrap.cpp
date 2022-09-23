@@ -13,7 +13,10 @@ namespace Goss
 		CreateCommandBuffers();
 	}
 
-	Bootstrap::~Bootstrap() { vkDestroyPipelineLayout(engineDevice.Device(), pipelineLayout, nullptr); }
+	Bootstrap::~Bootstrap()
+	{
+		vkDestroyPipelineLayout(engineDevice.Device(), pipelineLayout, nullptr);
+	}
 
 	void Bootstrap::Run()
 	{
@@ -42,7 +45,7 @@ namespace Goss
 
 	void Bootstrap::CreatePipeline()
 	{
-		auto pipelineConfig = Pipeline::DefaultPipelineConfigInfo(swapChain.Width(), swapChain.Height());
+		PipelineConfigInfo pipelineConfig = Pipeline::DefaultPipelineConfigInfo(swapChain.Width(), swapChain.Height());
 		pipelineConfig.renderPass = swapChain.GetRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		pipeline = std::make_unique<Pipeline>(engineDevice,
@@ -107,7 +110,7 @@ namespace Goss
 	void Bootstrap::DrawFrame()
 	{
 		uint32_t imageIndex;
-		auto result = swapChain.AcquireNextImage(&imageIndex);
+		VkResult result = swapChain.AcquireNextImage(&imageIndex);
 		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
 		{
 			throw std::runtime_error("Failed to acquire swap chain image!");

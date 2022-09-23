@@ -10,7 +10,6 @@ namespace Goss
 	{
 		VkViewport viewport;
 		VkRect2D scissor;
-		VkPipelineViewportStateCreateInfo viewportInfo;
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
 		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
 		VkPipelineMultisampleStateCreateInfo multiSampleInfo;
@@ -38,8 +37,9 @@ namespace Goss
 	private:
 		static std::vector<char> ReadFile(const char* filepath);
 		void CreateGraphicsPipeline(const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo);
-
 		void CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) const;
+
+		static void EnableAlphaBlending(PipelineConfigInfo& configInfo);
 
 		EngineDevice& engineDevice;
 		VkPipeline graphicsPipeline;

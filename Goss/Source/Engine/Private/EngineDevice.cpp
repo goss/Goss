@@ -9,14 +9,10 @@
 namespace Goss
 {
 	// local callback functions
-	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT messageType,
-		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-		void* pUserData)
+	static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType,
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 	{
-		std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
-
+		std::cerr << "\n" << "Validation layer: " << pCallbackData->pMessage << "\n" << std::endl;
 		return VK_FALSE;
 	}
 
@@ -71,14 +67,14 @@ namespace Goss
 	{
 		if (enableValidationLayers && !CheckValidationLayerSupport())
 		{
-			throw std::runtime_error("validation layers requested, but not available!");
+			throw std::runtime_error("Validation layers requested, but not available!");
 		}
 
 		VkApplicationInfo appInfo = {};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-		appInfo.pApplicationName = "LittleVulkanEngine App";
+		appInfo.pApplicationName = "Goss App";
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-		appInfo.pEngineName = "No Engine";
+		appInfo.pEngineName = "Goss Engine";
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.apiVersion = VK_API_VERSION_1_0;
 
@@ -107,7 +103,7 @@ namespace Goss
 
 		if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
 		{
-			throw std::runtime_error("failed to create instance!");
+			throw std::runtime_error("Failed to create instance!");
 		}
 
 		HasGFLWRequiredInstanceExtensions();
@@ -231,8 +227,7 @@ namespace Goss
 		VkPhysicalDeviceFeatures supportedFeatures;
 		vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
 
-		return indices.IsComplete() && extensionsSupported && swapChainAdequate &&
-			supportedFeatures.samplerAnisotropy;
+		return indices.IsComplete() && extensionsSupported && swapChainAdequate &&supportedFeatures.samplerAnisotropy;
 	}
 
 	void EngineDevice::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
@@ -315,7 +310,7 @@ namespace Goss
 		std::vector<VkExtensionProperties> extensions(extensionCount);
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-		std::cout << "available extensions:" << std::endl;
+		std::cout << "Available extensions:" << std::endl;
 		std::unordered_set<std::string> available;
 		for (const auto& extension : extensions)
 		{
@@ -323,7 +318,7 @@ namespace Goss
 			available.insert(extension.extensionName);
 		}
 
-		std::cout << "required extensions:" << std::endl;
+		std::cout << "Required extensions:" << std::endl;
 		const auto requiredExtensions = GetRequiredExtensions();
 		for (const auto& required : requiredExtensions)
 		{

@@ -15,39 +15,39 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\ApplicationWindow.cpp">
+    <ClCompile Include="Source\Engine\Private\ApplicationWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Pipeline.cpp">
+    <ClCompile Include="Source\Engine\Private\Pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Goss.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\EngineDevice.cpp">
+    <ClCompile Include="Source\Engine\Private\EngineDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\SwapChain.cpp">
+    <ClCompile Include="Source\Engine\Private\SwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Bootstrap.cpp">
+    <ClCompile Include="Source\Engine\Private\Bootstrap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Public\ApplicationWindow.h">
+    <ClInclude Include="Source\Engine\Public\ApplicationWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\Pipeline.h">
+    <ClInclude Include="Source\Engine\Public\Pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\EngineDevice.h">
+    <ClInclude Include="Source\Engine\Public\EngineDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\SwapChain.h">
+    <ClInclude Include="Source\Engine\Public\SwapChain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Public\Bootstrap.h">
+    <ClInclude Include="Source\Engine\Public\Bootstrap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
