@@ -25,18 +25,34 @@ namespace Goss
 		fragShaderModule = VK_NULL_HANDLE;
 	}
 
+	std::vector<char> Pipeline::ReadFile(const char* filepath)
+	{
+		std::ifstream file = std::ifstream(filepath, std::ios::ate | std::ios::binary);
+		if(file.is_open())
+		{
+			const std::streamsize fileSize = file.tellg();
+			std::vector<char> buffer(fileSize);
+
+			file.seekg(0);
+			file.read(buffer.data(), fileSize);
+			file.close();
+			return buffer;
+		}
+		throw std::runtime_error(std::string("Failed to open file: ").append(filepath));
+	}
+
 	void Pipeline::Bind(const VkCommandBuffer commandBuffer) const
 	{
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}
 
-	PipelineConfigInfo Pipeline::DefaultPipelineConfigInfo(const uint32_t width, const uint32_t height)
+	void Pipeline::DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo, const uint32_t width, const uint32_t height)
 	{
-		PipelineConfigInfo configInfo{};
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
+#if true
 		configInfo.viewport.x = 0.0f;
 		configInfo.viewport.y = 0.0f;
 		configInfo.viewport.width = static_cast<float>(width);
@@ -46,6 +62,13 @@ namespace Goss
 
 		configInfo.scissor.offset = {0, 0};
 		configInfo.scissor.extent = {width, height};
+#endif
+
+		configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		configInfo.viewportInfo.viewportCount = 1;
+		configInfo.viewportInfo.pViewports = &configInfo.viewport; 
+		configInfo.viewportInfo.scissorCount = 1;
+		configInfo.viewportInfo.pScissors = &configInfo.scissor;
 
 		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -97,23 +120,14 @@ namespace Goss
 		configInfo.depthStencilInfo.front = {};  // Optional
 		configInfo.depthStencilInfo.back = {};   // Optional
 
-		return configInfo;
-	}
+		configInfo.dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		configInfo.dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
+		configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
+		configInfo.dynamicStateInfo.flags = 0;
 
-	std::vector<char> Pipeline::ReadFile(const char* filepath)
-	{
-		std::ifstream file = std::ifstream(filepath, std::ios::ate | std::ios::binary);
-		if(file.is_open())
-		{
-			const std::streamsize fileSize = file.tellg();
-			std::vector<char> buffer(fileSize);
-
-			file.seekg(0);
-			file.read(buffer.data(), fileSize);
-			file.close();
-			return buffer;
-		}
-		throw std::runtime_error(std::string("Failed to open file: ").append(filepath));
+		//configInfo.bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
+		//configInfo.attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
 	}
 
 	void Pipeline::CreateGraphicsPipeline(const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo)
@@ -145,41 +159,27 @@ namespace Goss
 		shaderStages[1].flags = 0;
 		shaderStages[1].pSpecializationInfo = nullptr;
 
-		//auto& bindingDescriptions = configInfo.bindingDescriptions;
-		//auto& attributeDescriptions = configInfo.attributeDescriptions;
-		//VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-		//vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		//vertexInputInfo.vertexAttributeDescriptionCount =static_cast<uint32_t>(attributeDescriptions.size());
-		//vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
-		//vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-		//vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
-
-		VkPipelineVertexInputStateCreateInfo vertexInputState{};
-		vertexInputState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputState.vertexAttributeDescriptionCount = 0;
-		vertexInputState.vertexBindingDescriptionCount = 0;
-		vertexInputState.pVertexAttributeDescriptions = nullptr;
-		vertexInputState.pVertexBindingDescriptions = nullptr;
-
-		VkPipelineViewportStateCreateInfo viewportInfo{};
-		viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		viewportInfo.viewportCount = 1;
-		viewportInfo.pViewports = &configInfo.viewport;
-		viewportInfo.scissorCount = 1;
-		viewportInfo.pScissors = &configInfo.scissor;
+		auto& bindingDescriptions = configInfo.bindingDescriptions;
+		auto& attributeDescriptions = configInfo.attributeDescriptions;
+		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		pipelineInfo.stageCount = 2;
 		pipelineInfo.pStages = shaderStages;
-		pipelineInfo.pVertexInputState = &vertexInputState;
+		pipelineInfo.pVertexInputState = &vertexInputInfo;
 		pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
 		pipelineInfo.pMultisampleState = &configInfo.multiSampleInfo;
-		pipelineInfo.pViewportState = &viewportInfo; //&configInfo.viewportInfo
+		pipelineInfo.pViewportState = &configInfo.viewportInfo;
 		pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
 		pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
 		pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
-		pipelineInfo.pDynamicState = nullptr;
+		pipelineInfo.pDynamicState = &configInfo.dynamicStateInfo;
 
 		pipelineInfo.layout = configInfo.pipelineLayout;
 		pipelineInfo.renderPass = configInfo.renderPass;
