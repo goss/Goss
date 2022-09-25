@@ -4,6 +4,7 @@
 #include "EngineDevice.h"
 #include "Pipeline.h"
 #include "SwapChain.h"
+#include "Model.h"
 
 // std
 #include <memory>
@@ -26,6 +27,7 @@ namespace Goss
 		void Run();
 
 	private:
+		void LoadModels();
 		void CreatePipelineLayout();
 		void CreatePipeline();
 		void CreateCommandBuffers();
@@ -38,5 +40,6 @@ namespace Goss
 		std::unique_ptr<Pipeline> pipeline;
 		VkPipelineLayout pipelineLayout{};
 		std::vector<VkCommandBuffer> commandBuffers;
+		std::unique_ptr<Model> model;
 	};
 }

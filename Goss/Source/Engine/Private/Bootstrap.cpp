@@ -8,6 +8,7 @@ namespace Goss
 {
 	Bootstrap::Bootstrap()
 	{
+		LoadModels();
 		CreatePipelineLayout();
 		CreatePipeline();
 		CreateCommandBuffers();
@@ -27,6 +28,12 @@ namespace Goss
 		}
 
 		vkDeviceWaitIdle(engineDevice.Device());
+	}
+
+	void Bootstrap::LoadModels()
+	{
+		std::vector<Model::Vertex> vertices{{{0.0f, -0.5f}}, {{0.5f, 0.5f}}, {{-0.5f, 0.5f}}};
+		model = std::make_unique<Model>(engineDevice, vertices);
 	}
 
 	void Bootstrap::CreatePipelineLayout()
@@ -49,7 +56,6 @@ namespace Goss
 		Pipeline::DefaultPipelineConfigInfo(pipelineConfig, swapChain.Width(), swapChain.Height());
 		pipelineConfig.renderPass = swapChain.GetRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
-
 
 		pipeline = std::make_unique<Pipeline>(engineDevice,
 			"shaders/simple_shader.vert.spv",
@@ -117,7 +123,8 @@ namespace Goss
 			vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
 			pipeline->Bind(commandBuffer);
-			vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+			model->Bind(commandBuffer);
+			model->Draw(commandBuffer); //vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 
 			vkCmdEndRenderPass(commandBuffer);
 

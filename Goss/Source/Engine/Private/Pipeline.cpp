@@ -1,10 +1,12 @@
 #include "Pipeline.h"
+#include "Model.h"
 
+// std
 #include <cassert>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include <vector>
-#include <iostream>
 
 namespace Goss
 {
@@ -126,8 +128,8 @@ namespace Goss
 		configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
 		configInfo.dynamicStateInfo.flags = 0;
 
-		//configInfo.bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
-		//configInfo.attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
+		configInfo.bindingDescriptions = Model::Vertex::GetBindingDescriptions();
+		configInfo.attributeDescriptions = Model::Vertex::GetAttributeDescriptions();
 	}
 
 	void Pipeline::CreateGraphicsPipeline(const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo)
