@@ -32,6 +32,7 @@ namespace Goss
 		void CreatePipeline();
 		void CreateCommandBuffers();
 		void DrawFrame();
+		static void Sierpinski(std::vector<Model::Vertex>& vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top);
 
 		ApplicationWindow appWindow{WIDTH, HEIGHT, "Goss"};
 		EngineDevice engineDevice{appWindow};

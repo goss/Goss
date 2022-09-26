@@ -32,8 +32,33 @@ namespace Goss
 
 	void Bootstrap::LoadModels()
 	{
-		std::vector<Model::Vertex> vertices{{{0.0f, -0.5f}}, {{0.5f, 0.5f}}, {{-0.5f, 0.5f}}};
+		std::vector<Model::Vertex> vertices
+		{
+			{{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+		};
+		//Sierpinski(vertices, 3, {-0.5f, 0.5f}, {0.5f, 0.5f}, {0.0f, -0.5f});
 		model = std::make_unique<Model>(engineDevice, vertices);
+	}
+
+	void Bootstrap::Sierpinski(std::vector<Model::Vertex>& vertices, const int depth, const glm::vec2 left, const glm::vec2 right, const glm::vec2 top)
+	{
+		if (depth <= 0)
+		{
+			vertices.push_back({top});
+			vertices.push_back({right});
+			vertices.push_back({left});
+		}
+		else
+		{
+			const auto leftTop = 0.5f * (left + top);
+			const auto rightTop = 0.5f * (right + top);
+			const auto leftRight = 0.5f * (left + right);
+			Sierpinski(vertices, depth - 1, left, leftRight, leftTop);
+			Sierpinski(vertices, depth - 1, leftRight, right, rightTop);
+			Sierpinski(vertices, depth - 1, leftTop, rightTop, top);
+		}
 	}
 
 	void Bootstrap::CreatePipelineLayout()
@@ -124,7 +149,7 @@ namespace Goss
 
 			pipeline->Bind(commandBuffer);
 			model->Bind(commandBuffer);
-			model->Draw(commandBuffer); //vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+			model->Draw(commandBuffer);
 
 			vkCmdEndRenderPass(commandBuffer);
 

@@ -36,7 +36,7 @@ namespace Goss
 
 		// Not copyable or movable
 		EngineDevice(const EngineDevice&) = delete;
-		void operator=(const EngineDevice&) = delete;
+		EngineDevice& operator=(const EngineDevice&) = delete;
 
 		VkCommandPool GetCommandPool() const { return commandPool; }
 		VkDevice Device() const { return vkDevice; }

@@ -25,7 +25,7 @@ namespace Goss
 		device.CreateBuffer(
 			bufferSize,
 			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, //CPU
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 			vertexBuffer,
 			vertexBufferMemory);
 
@@ -49,20 +49,20 @@ namespace Goss
 
 	std::vector<VkVertexInputBindingDescription> Model::Vertex::GetBindingDescriptions()
 	{
-		std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
-		bindingDescriptions[0].binding = 0;
-		bindingDescriptions[0].stride = sizeof(Vertex);
-		bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+		std::vector<VkVertexInputBindingDescription> bindingDescriptions
+		{
+			{0, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX}
+		};
 		return bindingDescriptions;
 	}
 
 	std::vector<VkVertexInputAttributeDescription> Model::Vertex::GetAttributeDescriptions()
 	{
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions(1);
-		attributeDescriptions[0].binding = 0;
-		attributeDescriptions[0].location = 0;
-		attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-		attributeDescriptions[0].offset = 0;
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions
+		{
+			{0, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, position)},
+			{1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color)}
+		};
 		return attributeDescriptions;
 	}
 }

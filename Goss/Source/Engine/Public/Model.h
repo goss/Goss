@@ -18,6 +18,7 @@ namespace Goss
 		struct Vertex
 		{
 			glm::vec2 position;
+			glm::vec3 color{1.0, 0.5, 0.0};
 
 			static std::vector<VkVertexInputBindingDescription> GetBindingDescriptions();
 			static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
@@ -31,7 +32,7 @@ namespace Goss
 
 		void Bind(VkCommandBuffer commandBuffer) const;
 		void Draw(VkCommandBuffer commandBuffer) const;
-
+		
 	private:
 		void CreateVertexBuffers(const std::vector<Vertex>& vertices);
 
