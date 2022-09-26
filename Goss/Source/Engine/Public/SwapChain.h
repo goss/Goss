@@ -3,6 +3,7 @@
 
 // std
 #include <vector>
+#include <memory>
 
 namespace Goss
 {
@@ -12,12 +13,13 @@ namespace Goss
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 		SwapChain(EngineDevice& deviceRef, VkExtent2D extent);
+		SwapChain(EngineDevice& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous);
 		~SwapChain();
 
 		SwapChain(const SwapChain&) = delete;
 		SwapChain& operator=(const SwapChain&) = delete;
 
-		VkFramebuffer GetFrameBuffer(const int index) const { return swapChainFrameBuffers[index]; }
+		VkFramebuffer GetFrameBuffer(const uint32_t index) const { return swapChainFrameBuffers[index]; }
 		VkRenderPass GetRenderPass() const { return renderPass; }
 		VkImageView GetImageView(const int index) const { return swapChainImageViews[index]; }
 		size_t ImageCount() const { return swapChainImages.size(); }
@@ -37,6 +39,7 @@ namespace Goss
 		VkResult SubmitCommandBuffers(const VkCommandBuffer* buffers, const uint32_t* imageIndex);
 
 	private:
+		void Init();
 		void CreateSwapChain();
 		void CreateImageViews();
 		void CreateDepthResources();
@@ -65,6 +68,7 @@ namespace Goss
 		VkExtent2D windowExtent;
 
 		VkSwapchainKHR swapChain{};
+		std::shared_ptr<SwapChain> oldSwapChain;
 
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;

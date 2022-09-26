@@ -8,15 +8,12 @@ namespace Goss
 {
 	struct PipelineConfigInfo
 	{
-		PipelineConfigInfo() = default;
 		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
 		PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
-		VkViewport viewport{};
-		VkRect2D scissor{};
-
 		std::vector<VkVertexInputBindingDescription> bindingDescriptions{};
 		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
+
 		std::vector<VkDynamicState> dynamicStateEnables;
 		VkPipelineDynamicStateCreateInfo dynamicStateInfo{};
 
@@ -43,7 +40,7 @@ namespace Goss
 
 		void Bind(VkCommandBuffer commandBuffer) const;
 
-		static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);
+		static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 	private:
 		static std::vector<char> ReadFile(const char* filepath);

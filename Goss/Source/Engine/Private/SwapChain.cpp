@@ -12,57 +12,60 @@ namespace Goss
 {
 	SwapChain::SwapChain(EngineDevice& deviceRef, VkExtent2D extent) : device{deviceRef}, windowExtent{extent}
 	{
-		CreateSwapChain();
-		CreateImageViews();
-		CreateRenderPass();
-		CreateDepthResources();
-		CreateFrameBuffers();
-		CreateSyncObjects();
+		Init();
+	}
+
+	SwapChain::SwapChain(EngineDevice& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous):
+		device(deviceRef), windowExtent{extent}, oldSwapChain(std::move(previous))
+	{
+		Init();
+		//No longer needed after init
+		oldSwapChain = nullptr;
 	}
 
 	SwapChain::~SwapChain()
 	{
 		for (const auto imageView : swapChainImageViews)
 		{
-			vkDestroyImageView(device.Device(), imageView, nullptr);
+			vkDestroyImageView(device.GetDevice(), imageView, nullptr);
 		}
 		swapChainImageViews.clear();
 
 		if (swapChain != nullptr)
 		{
-			vkDestroySwapchainKHR(device.Device(), swapChain, nullptr);
+			vkDestroySwapchainKHR(device.GetDevice(), swapChain, nullptr);
 			swapChain = nullptr;
 		}
 
 		const int size = static_cast<int>(depthImages.size());
 		for (int i = 0; i < size; i++)
 		{
-			vkDestroyImageView(device.Device(), depthImageViews[i], nullptr);
-			vkDestroyImage(device.Device(), depthImages[i], nullptr);
-			vkFreeMemory(device.Device(), depthImageMemory[i], nullptr);
+			vkDestroyImageView(device.GetDevice(), depthImageViews[i], nullptr);
+			vkDestroyImage(device.GetDevice(), depthImages[i], nullptr);
+			vkFreeMemory(device.GetDevice(), depthImageMemory[i], nullptr);
 		}
 
 		for (const auto frameBuffer : swapChainFrameBuffers)
 		{
-			vkDestroyFramebuffer(device.Device(), frameBuffer, nullptr);
+			vkDestroyFramebuffer(device.GetDevice(), frameBuffer, nullptr);
 		}
 
-		vkDestroyRenderPass(device.Device(), renderPass, nullptr);
+		vkDestroyRenderPass(device.GetDevice(), renderPass, nullptr);
 
 		// cleanup synchronization objects
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
-			vkDestroySemaphore(device.Device(), renderFinishedSemaphores[i], nullptr);
-			vkDestroySemaphore(device.Device(), imageAvailableSemaphores[i], nullptr);
-			vkDestroyFence(device.Device(), inFlightFences[i], nullptr);
+			vkDestroySemaphore(device.GetDevice(), renderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(device.GetDevice(), imageAvailableSemaphores[i], nullptr);
+			vkDestroyFence(device.GetDevice(), inFlightFences[i], nullptr);
 		}
 	}
 
 	VkResult SwapChain::AcquireNextImage(uint32_t* imageIndex) const
 	{
-		vkWaitForFences(device.Device(),1, &inFlightFences[currentFrame],VK_TRUE,std::numeric_limits<uint64_t>::max());
+		vkWaitForFences(device.GetDevice(),1, &inFlightFences[currentFrame],VK_TRUE,std::numeric_limits<uint64_t>::max());
 
-		const VkResult result = vkAcquireNextImageKHR(device.Device(), swapChain,
+		const VkResult result = vkAcquireNextImageKHR(device.GetDevice(), swapChain,
 			std::numeric_limits<uint64_t>::max(),imageAvailableSemaphores[currentFrame], // must be a not signaled semaphore
 			VK_NULL_HANDLE, imageIndex);
 
@@ -73,7 +76,7 @@ namespace Goss
 	{
 		if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
 		{
-			vkWaitForFences(device.Device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
+			vkWaitForFences(device.GetDevice(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
 		}
 		imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
 
@@ -93,7 +96,7 @@ namespace Goss
 		submitInfo.signalSemaphoreCount = 1;
 		submitInfo.pSignalSemaphores = signalSemaphores;
 
-		vkResetFences(device.Device(), 1, &inFlightFences[currentFrame]);
+		vkResetFences(device.GetDevice(), 1, &inFlightFences[currentFrame]);
 		if (vkQueueSubmit(device.GraphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to submit draw command buffer!");
@@ -116,6 +119,16 @@ namespace Goss
 		currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
 		return result;
+	}
+
+	void SwapChain::Init()
+	{
+		CreateSwapChain();
+		CreateImageViews();
+		CreateRenderPass();
+		CreateDepthResources();
+		CreateFrameBuffers();
+		CreateSyncObjects();
 	}
 
 	void SwapChain::CreateSwapChain()
@@ -162,9 +175,9 @@ namespace Goss
 		createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
-		if (vkCreateSwapchainKHR(device.Device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
+		if (vkCreateSwapchainKHR(device.GetDevice(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create swap chain!");
 		}
@@ -173,9 +186,9 @@ namespace Goss
 		// allowed to create a swap chain with more. That's why we'll first query the final number of
 		// images with vkGetSwapchainImagesKHR, then resize the container and finally call it again to
 		// retrieve the handles.
-		vkGetSwapchainImagesKHR(device.Device(), swapChain, &imageCount, nullptr);
+		vkGetSwapchainImagesKHR(device.GetDevice(), swapChain, &imageCount, nullptr);
 		swapChainImages.resize(imageCount);
-		vkGetSwapchainImagesKHR(device.Device(), swapChain, &imageCount, swapChainImages.data());
+		vkGetSwapchainImagesKHR(device.GetDevice(), swapChain, &imageCount, swapChainImages.data());
 
 		swapChainImageFormat = surfaceFormat.format;
 		swapChainExtent = extent;
@@ -197,7 +210,7 @@ namespace Goss
 			viewInfo.subresourceRange.baseArrayLayer = 0;
 			viewInfo.subresourceRange.layerCount = 1;
 
-			if (vkCreateImageView(device.Device(), &viewInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS)
+			if (vkCreateImageView(device.GetDevice(), &viewInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to create texture image view!");
 			}
@@ -259,7 +272,7 @@ namespace Goss
 		renderPassInfo.dependencyCount = 1;
 		renderPassInfo.pDependencies = &dependency;
 
-		if (vkCreateRenderPass(device.Device(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
+		if (vkCreateRenderPass(device.GetDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create render pass!");
 		}
@@ -282,7 +295,7 @@ namespace Goss
 			framebufferCreateInfo.height = chainExtent.height;
 			framebufferCreateInfo.layers = 1;
 
-			if (vkCreateFramebuffer(device.Device(), &framebufferCreateInfo,nullptr, &swapChainFrameBuffers[i]) != VK_SUCCESS)
+			if (vkCreateFramebuffer(device.GetDevice(), &framebufferCreateInfo,nullptr, &swapChainFrameBuffers[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to create framebuffer!");
 			}
@@ -330,7 +343,7 @@ namespace Goss
 			viewInfo.subresourceRange.baseArrayLayer = 0;
 			viewInfo.subresourceRange.layerCount = 1;
 
-			if (vkCreateImageView(device.Device(), &viewInfo, nullptr, &depthImageViews[i]) != VK_SUCCESS)
+			if (vkCreateImageView(device.GetDevice(), &viewInfo, nullptr, &depthImageViews[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to create texture image view!");
 			}
@@ -353,9 +366,9 @@ namespace Goss
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 		{
-			if (vkCreateSemaphore(device.Device(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-				vkCreateSemaphore(device.Device(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-				vkCreateFence(device.Device(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
+			if (vkCreateSemaphore(device.GetDevice(), &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+				vkCreateSemaphore(device.GetDevice(), &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+				vkCreateFence(device.GetDevice(), &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS)
 			{
 				throw std::runtime_error("failed to create synchronization objects for a frame!");
 			}

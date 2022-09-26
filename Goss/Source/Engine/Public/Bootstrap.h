@@ -31,12 +31,16 @@ namespace Goss
 		void CreatePipelineLayout();
 		void CreatePipeline();
 		void CreateCommandBuffers();
+		void FreeCommandBuffers();
 		void DrawFrame();
+		void CreateSwapChain();
+		void RecordCommandBuffer(uint32_t imageIndex) const;
+
 		static void Sierpinski(std::vector<Model::Vertex>& vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top);
 
 		ApplicationWindow appWindow{WIDTH, HEIGHT, "Goss"};
 		EngineDevice engineDevice{appWindow};
-		SwapChain swapChain{engineDevice, appWindow.GetExtent()};
+		std::unique_ptr<SwapChain> swapChain; 
 
 		std::unique_ptr<Pipeline> pipeline;
 		VkPipelineLayout pipelineLayout{};

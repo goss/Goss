@@ -10,8 +10,9 @@ namespace Goss
 	{
 	    GLFWwindow* window = nullptr;
 
-		const int width;
-		const int height;
+		int width;
+		int height;
+		bool framebufferResized = false;
 
 	public:
 	    ApplicationWindow(int width, int height, const char* name);
@@ -24,6 +25,12 @@ namespace Goss
 		VkExtent2D GetExtent() const { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }
 
 		void CreateWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const;
+
+		bool WasWindowResized() const { return framebufferResized;}
+		void ResetResizedFlag() { framebufferResized = false;}
+	private:
+		static void FramebufferResizedCallback(GLFWwindow *window, int width, int height);
+
 	};
 }
 

@@ -16,9 +16,10 @@ namespace Goss
 		CreateGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
 	}
 
+
 	Pipeline::~Pipeline()
 	{
-		const VkDevice device = engineDevice.Device();
+		const VkDevice device = engineDevice.GetDevice();
 		vkDestroyShaderModule(device, vertShaderModule, nullptr);
 		vkDestroyShaderModule(device, fragShaderModule, nullptr);
 		vkDestroyPipeline(device, graphicsPipeline, nullptr);
@@ -48,29 +49,17 @@ namespace Goss
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}
 
-	void Pipeline::DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo, const uint32_t width, const uint32_t height)
+	void Pipeline::DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	{
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
-#if true
-		configInfo.viewport.x = 0.0f;
-		configInfo.viewport.y = 0.0f;
-		configInfo.viewport.width = static_cast<float>(width);
-		configInfo.viewport.height = static_cast<float>(height);
-		configInfo.viewport.minDepth = 0.0f;
-		configInfo.viewport.maxDepth = 1.0f;
-
-		configInfo.scissor.offset = {0, 0};
-		configInfo.scissor.extent = {width, height};
-#endif
-
 		configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		configInfo.viewportInfo.viewportCount = 1;
-		configInfo.viewportInfo.pViewports = &configInfo.viewport; 
+		configInfo.viewportInfo.pViewports = nullptr; 
 		configInfo.viewportInfo.scissorCount = 1;
-		configInfo.viewportInfo.pScissors = &configInfo.scissor;
+		configInfo.viewportInfo.pScissors = nullptr;
 
 		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -190,7 +179,7 @@ namespace Goss
 		pipelineInfo.basePipelineIndex = -1;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-		if(vkCreateGraphicsPipelines(engineDevice.Device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
+		if(vkCreateGraphicsPipelines(engineDevice.GetDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create graphics pipeline");
 		}
@@ -203,7 +192,7 @@ namespace Goss
 		createInfo.codeSize = code.size();
 		createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-		if(vkCreateShaderModule(engineDevice.Device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS)
+		if(vkCreateShaderModule(engineDevice.GetDevice(), &createInfo, nullptr, shaderModule) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create shader module");
 		}

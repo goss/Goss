@@ -13,8 +13,8 @@ namespace Goss
 
 	Model::~Model()
 	{
-		vkDestroyBuffer(device.Device(), vertexBuffer, nullptr);
-		vkFreeMemory(device.Device(), vertexBufferMemory, nullptr);
+		vkDestroyBuffer(device.GetDevice(), vertexBuffer, nullptr);
+		vkFreeMemory(device.GetDevice(), vertexBufferMemory, nullptr);
 	}
 
 	void Model::CreateVertexBuffers(const std::vector<Vertex>& vertices)
@@ -30,9 +30,9 @@ namespace Goss
 			vertexBufferMemory);
 
 		void* data;
-		vkMapMemory(device.Device(), vertexBufferMemory, 0, bufferSize, 0, &data);
+		vkMapMemory(device.GetDevice(), vertexBufferMemory, 0, bufferSize, 0, &data);
 		memcpy(data, vertices.data(), bufferSize);
-		vkUnmapMemory(device.Device(), vertexBufferMemory);
+		vkUnmapMemory(device.GetDevice(), vertexBufferMemory);
 	}
 
 	void Model::Bind(const VkCommandBuffer commandBuffer) const

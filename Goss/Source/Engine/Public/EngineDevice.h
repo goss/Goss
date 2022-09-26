@@ -39,7 +39,7 @@ namespace Goss
 		EngineDevice& operator=(const EngineDevice&) = delete;
 
 		VkCommandPool GetCommandPool() const { return commandPool; }
-		VkDevice Device() const { return vkDevice; }
+		VkDevice GetDevice() const { return vkDevice; }
 		VkSurfaceKHR Surface() const { return vkSurfaceKHR; }
 		VkQueue GraphicsQueue() const { return graphicsQueue; }
 		VkQueue PresentQueue() const { return presentQueue; }

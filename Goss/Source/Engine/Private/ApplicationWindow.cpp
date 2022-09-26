@@ -10,8 +10,12 @@ namespace Goss
 		glfwInit();
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+
 		window = glfwCreateWindow(width, height, name, nullptr, nullptr);
+
+		glfwSetWindowUserPointer(window, this);
+		glfwSetFramebufferSizeCallback(window, FramebufferResizedCallback);
 
 		std::cout << "GLFW Version: " << glfwGetVersionString() << std::endl;
 	}
@@ -28,5 +32,13 @@ namespace Goss
 		{
 			throw std::runtime_error("Failed to create window surface");
 		}
+	}
+
+	void ApplicationWindow::FramebufferResizedCallback(GLFWwindow* window, const int width, const int height)
+	{
+		ApplicationWindow* appWindow = static_cast<ApplicationWindow*>(glfwGetWindowUserPointer(window));
+		appWindow->framebufferResized = true;
+		appWindow->width = width;
+		appWindow->height = height;
 	}
 }
