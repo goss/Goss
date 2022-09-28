@@ -29,7 +29,7 @@ namespace Goss
 	private:
 		void LoadGameObjects();
 
-		static void Sierpinski(std::vector<Model::Vertex>& vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top);
+		std::unique_ptr<Model> CreateCubeModel(glm::vec3 offset);
 
 		ApplicationWindow window{WIDTH, HEIGHT, "Goss"};
 		Device device{window};

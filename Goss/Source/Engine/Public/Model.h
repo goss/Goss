@@ -13,8 +13,8 @@ namespace Goss
 	public:
 		struct Vertex
 		{
-			glm::vec2 position;
-			glm::vec3 color{1.0, 0.5, 0.0};
+			glm::vec3 position{};
+			glm::vec3 color{};
 
 			static std::vector<VkVertexInputBindingDescription> GetBindingDescriptions();
 			static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();

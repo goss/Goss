@@ -2,9 +2,6 @@
 #include "Pipeline.h"
 
 // glm
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
@@ -15,16 +12,15 @@ namespace Goss
 {
 	/**
 	* Limited Constant data size is 128 bytes
-	* Used for instancing
+	* Can be used for instancing
 	*/
-	struct ConstantData
+	struct PushConstantData
 	{
-		glm::mat2 transform{1.f};
-		glm::vec2 offset;
-		alignas(16) glm::vec3 color;
+		glm::mat4 transform{1.f};
+		alignas(16) glm::vec3 color{};
 	};
 
-	RenderSystem::RenderSystem(Device& device, VkRenderPass renderPass) : lveDevice{device}
+	RenderSystem::RenderSystem(Device& device, const VkRenderPass renderPass) : lveDevice{device}
 	{
 		CreatePipelineLayout();
 		CreatePipeline(renderPass);
@@ -40,7 +36,7 @@ namespace Goss
 		VkPushConstantRange pushConstantRange;
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
-		pushConstantRange.size = sizeof(ConstantData);
+		pushConstantRange.size = sizeof(PushConstantData);
 
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -76,19 +72,18 @@ namespace Goss
 
 		for (GameObject& gameObject : gameObjects)
 		{
-			gameObject.transform.rotation = glm::mod(gameObject.transform.rotation + 0.01f, glm::two_pi<float>());
+			gameObject.transform.rotation = mod(gameObject.transform.rotation + 0.0001f, glm::two_pi<float>());
 
-			ConstantData push{};
-			push.offset = gameObject.transform.translation;
+			PushConstantData push{};
 			push.color = gameObject.color;
-			push.transform = gameObject.transform.Mat2();
+			push.transform = gameObject.transform.Mat4();
 
 			vkCmdPushConstants(
 				commandBuffer,
 				pipelineLayout,
 				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 				0,
-				sizeof(ConstantData),
+				sizeof(PushConstantData),
 				&push);
 
 			gameObject.model->Bind(commandBuffer);
