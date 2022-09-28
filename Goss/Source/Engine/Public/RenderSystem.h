@@ -7,7 +7,7 @@ namespace Goss
 	class RenderSystem
 	{
 		public:
-		RenderSystem(EngineDevice &device, VkRenderPass renderPass);
+		RenderSystem(Device &device, VkRenderPass renderPass);
 		~RenderSystem();
 
 		RenderSystem(const RenderSystem &) = delete;
@@ -19,7 +19,7 @@ namespace Goss
 		void CreatePipelineLayout();
 		void CreatePipeline(VkRenderPass renderPass);
 
-		EngineDevice &lveDevice;
+		Device &lveDevice;
 
 		std::unique_ptr<Pipeline> lvePipeline;
 		VkPipelineLayout pipelineLayout;

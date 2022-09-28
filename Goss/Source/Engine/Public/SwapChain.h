@@ -1,5 +1,5 @@
 #pragma once
-#include "EngineDevice.h"
+#include "Device.h"
 
 // std
 #include <vector>
@@ -12,8 +12,8 @@ namespace Goss
 	public:
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-		SwapChain(EngineDevice& deviceRef, VkExtent2D extent);
-		SwapChain(EngineDevice& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous);
+		SwapChain(Device& deviceRef, VkExtent2D extent);
+		SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous);
 		~SwapChain();
 
 		SwapChain(const SwapChain&) = delete;
@@ -71,7 +71,7 @@ namespace Goss
 		std::vector<VkImage> swapChainImages;
 		std::vector<VkImageView> swapChainImageViews;
 
-		EngineDevice& device;
+		Device& device;
 		VkExtent2D windowExtent;
 
 		VkSwapchainKHR swapChain{};

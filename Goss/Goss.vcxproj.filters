@@ -24,7 +24,7 @@
     <ClCompile Include="Source\Goss.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Engine\Private\EngineDevice.cpp">
+    <ClCompile Include="Source\Engine\Private\Device.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Engine\Private\SwapChain.cpp">
@@ -50,7 +50,7 @@
     <ClInclude Include="Source\Engine\Public\Pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Engine\Public\EngineDevice.h">
+    <ClInclude Include="Source\Engine\Public\Device.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Engine\Public\SwapChain.h">

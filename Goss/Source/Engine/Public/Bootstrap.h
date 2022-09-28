@@ -1,14 +1,11 @@
 #pragma once
 
 #include "ApplicationWindow.h"
-#include "EngineDevice.h"
+#include "Device.h"
 #include "Model.h"
-#include "Pipeline.h"
 #include "Renderer.h"
-#include "SwapChain.h"
 
 // std
-#include <memory>
 #include <vector>
 
 namespace Goss
@@ -34,13 +31,10 @@ namespace Goss
 
 		static void Sierpinski(std::vector<Model::Vertex>& vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top);
 
-		ApplicationWindow appWindow{WIDTH, HEIGHT, "Goss"};
-		EngineDevice device{appWindow};
-		std::unique_ptr<SwapChain> swapChain; 
+		ApplicationWindow window{WIDTH, HEIGHT, "Goss"};
+		Device device{window};
+		Renderer renderer{window, device};
 
-		std::unique_ptr<Pipeline> pipeline;
-		std::vector<VkCommandBuffer> commandBuffers;
 		std::vector<GameObject> gameObjects;
-		Renderer renderer{appWindow, device};
 	};
 }

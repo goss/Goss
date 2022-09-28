@@ -6,7 +6,7 @@
 
 namespace Goss
 {
-	Model::Model(EngineDevice& device, const std::vector<Vertex>& vertices) : device{device}
+	Model::Model(Device& device, const std::vector<Vertex>& vertices) : device{device}
 	{
 		CreateVertexBuffers(vertices);
 	}

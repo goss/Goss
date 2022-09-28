@@ -1,4 +1,4 @@
-#include "EngineDevice.h"
+#include "Device.h"
 
 // std 
 #include <cstring>
@@ -39,7 +39,7 @@ namespace Goss
 		}
 	}
 
-	EngineDevice::EngineDevice(ApplicationWindow& window) : window{window}
+	Device::Device(ApplicationWindow& window) : window{window}
 	{
 		CreateInstance();
 		SetupDebugMessenger();
@@ -49,7 +49,7 @@ namespace Goss
 		CreateCommandPool();
 	}
 
-	EngineDevice::~EngineDevice()
+	Device::~Device()
 	{
 		vkDestroyCommandPool(vkDevice, commandPool, nullptr);
 		vkDestroyDevice(vkDevice, nullptr);
@@ -63,7 +63,7 @@ namespace Goss
 		vkDestroyInstance(instance, nullptr);
 	}
 
-	void EngineDevice::CreateInstance()
+	void Device::CreateInstance()
 	{
 		if (enableValidationLayers && !CheckValidationLayerSupport())
 		{
@@ -109,7 +109,7 @@ namespace Goss
 		HasGFLWRequiredInstanceExtensions();
 	}
 
-	void EngineDevice::PickPhysicalDevice()
+	void Device::PickPhysicalDevice()
 	{
 		uint32_t deviceCount = 0;
 		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -139,7 +139,7 @@ namespace Goss
 		std::cout << "Physical device: " << properties.deviceName << std::endl;
 	}
 
-	void EngineDevice::CreateLogicalDevice()
+	void Device::CreateLogicalDevice()
 	{
 		QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
 
@@ -191,7 +191,7 @@ namespace Goss
 		vkGetDeviceQueue(vkDevice, indices.presentFamily, 0, &presentQueue);
 	}
 
-	void EngineDevice::CreateCommandPool()
+	void Device::CreateCommandPool()
 	{
 		const QueueFamilyIndices queueFamilyIndices = FindPhysicalQueueFamilies();
 
@@ -206,12 +206,12 @@ namespace Goss
 		}
 	}
 
-	void EngineDevice::CreateSurface()
+	void Device::CreateSurface()
 	{
 		window.CreateWindowSurface(instance, &vkSurfaceKHR);
 	}
 
-	bool EngineDevice::IsDeviceSuitable(VkPhysicalDevice device) const
+	bool Device::IsDeviceSuitable(VkPhysicalDevice device) const
 	{
 		QueueFamilyIndices indices = FindQueueFamilies(device);
 
@@ -230,7 +230,7 @@ namespace Goss
 		return indices.IsComplete() && extensionsSupported && swapChainAdequate &&supportedFeatures.samplerAnisotropy;
 	}
 
-	void EngineDevice::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+	void Device::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
 	{
 		createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -246,7 +246,7 @@ namespace Goss
 		createInfo.pUserData = nullptr; // Optional
 	}
 
-	void EngineDevice::SetupDebugMessenger()
+	void Device::SetupDebugMessenger()
 	{
 		if (!enableValidationLayers) return;
 
@@ -258,7 +258,7 @@ namespace Goss
 		}
 	}
 
-	bool EngineDevice::CheckValidationLayerSupport() const
+	bool Device::CheckValidationLayerSupport() const
 	{
 		uint32_t layerCount;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -288,7 +288,7 @@ namespace Goss
 		return true;
 	}
 
-	std::vector<const char*> EngineDevice::GetRequiredExtensions() const
+	std::vector<const char*> Device::GetRequiredExtensions() const
 	{
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -303,7 +303,7 @@ namespace Goss
 		return extensions;
 	}
 
-	void EngineDevice::HasGFLWRequiredInstanceExtensions() const
+	void Device::HasGFLWRequiredInstanceExtensions() const
 	{
 		uint32_t extensionCount = 0;
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
@@ -330,7 +330,7 @@ namespace Goss
 		}
 	}
 
-	bool EngineDevice::CheckDeviceExtensionSupport(const VkPhysicalDevice device) const
+	bool Device::CheckDeviceExtensionSupport(const VkPhysicalDevice device) const
 	{
 		uint32_t extensionCount;
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -348,7 +348,7 @@ namespace Goss
 		return requiredExtensions.empty();
 	}
 
-	QueueFamilyIndices EngineDevice::FindQueueFamilies(const VkPhysicalDevice device) const
+	QueueFamilyIndices Device::FindQueueFamilies(const VkPhysicalDevice device) const
 	{
 		QueueFamilyIndices indices;
 
@@ -383,7 +383,7 @@ namespace Goss
 		return indices;
 	}
 
-	SwapChainSupportDetails EngineDevice::QuerySwapChainSupport(const VkPhysicalDevice device) const
+	SwapChainSupportDetails Device::QuerySwapChainSupport(const VkPhysicalDevice device) const
 	{
 		SwapChainSupportDetails details;
 		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, vkSurfaceKHR, &details.capabilities);
@@ -408,7 +408,7 @@ namespace Goss
 		return details;
 	}
 
-	VkFormat EngineDevice::FindSupportedFormat(const std::vector<VkFormat>& candidates, const VkImageTiling tiling, const VkFormatFeatureFlags features) const
+	VkFormat Device::FindSupportedFormat(const std::vector<VkFormat>& candidates, const VkImageTiling tiling, const VkFormatFeatureFlags features) const
 	{
 		for (const VkFormat format : candidates)
 		{
@@ -427,7 +427,7 @@ namespace Goss
 		throw std::runtime_error("failed to find supported format!");
 	}
 
-	uint32_t EngineDevice::FindMemoryType(const uint32_t typeFilter, const VkMemoryPropertyFlags flags) const
+	uint32_t Device::FindMemoryType(const uint32_t typeFilter, const VkMemoryPropertyFlags flags) const
 	{
 		VkPhysicalDeviceMemoryProperties memProperties;
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -442,7 +442,7 @@ namespace Goss
 		throw std::runtime_error("failed to find suitable memory type!");
 	}
 
-	void EngineDevice::CreateBuffer(const VkDeviceSize size, const VkBufferUsageFlags usage, const VkMemoryPropertyFlags flags, VkBuffer& buffer, VkDeviceMemory& bufferMemory) const
+	void Device::CreateBuffer(const VkDeviceSize size, const VkBufferUsageFlags usage, const VkMemoryPropertyFlags flags, VkBuffer& buffer, VkDeviceMemory& bufferMemory) const
 	{
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -471,7 +471,7 @@ namespace Goss
 		vkBindBufferMemory(vkDevice, buffer, bufferMemory, 0);
 	}
 
-	VkCommandBuffer EngineDevice::BeginSingleTimeCommands() const
+	VkCommandBuffer Device::BeginSingleTimeCommands() const
 	{
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -490,7 +490,7 @@ namespace Goss
 		return commandBuffer;
 	}
 
-	void EngineDevice::EndSingleTimeCommands(const VkCommandBuffer commandBuffer) const
+	void Device::EndSingleTimeCommands(const VkCommandBuffer commandBuffer) const
 	{
 		vkEndCommandBuffer(commandBuffer);
 
@@ -505,7 +505,7 @@ namespace Goss
 		vkFreeCommandBuffers(vkDevice, commandPool, 1, &commandBuffer);
 	}
 
-	void EngineDevice::CopyBuffer(const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize size) const
+	void Device::CopyBuffer(const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize size) const
 	{
 		const VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
@@ -518,7 +518,7 @@ namespace Goss
 		EndSingleTimeCommands(commandBuffer);
 	}
 
-	void EngineDevice::CopyBufferToImage(const VkBuffer buffer, const VkImage image, const uint32_t width, const uint32_t height, const uint32_t layerCount) const
+	void Device::CopyBufferToImage(const VkBuffer buffer, const VkImage image, const uint32_t width, const uint32_t height, const uint32_t layerCount) const
 	{
 		const VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
@@ -539,7 +539,7 @@ namespace Goss
 		EndSingleTimeCommands(commandBuffer);
 	}
 
-	void EngineDevice::CreateImageWithInfo(const VkImageCreateInfo& imageInfo, const VkMemoryPropertyFlags flags, VkImage& image, VkDeviceMemory& imageMemory) const
+	void Device::CreateImageWithInfo(const VkImageCreateInfo& imageInfo, const VkMemoryPropertyFlags flags, VkImage& image, VkDeviceMemory& imageMemory) const
 	{
 		if (vkCreateImage(vkDevice, &imageInfo, nullptr, &image) != VK_SUCCESS)
 		{

@@ -20,7 +20,7 @@ namespace Goss
 	void Bootstrap::Run()
 	{
 		const RenderSystem renderSystem{device, renderer.GetSwapChainRenderPass()};
-		while (!appWindow.ShouldClose())
+		while (!window.ShouldClose())
 		{
 			glfwPollEvents();
 			if (const VkCommandBuffer commandBuffer = renderer.BeginFrame()) 

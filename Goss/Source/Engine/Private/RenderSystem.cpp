@@ -24,7 +24,7 @@ namespace Goss
 		alignas(16) glm::vec3 color;
 	};
 
-	RenderSystem::RenderSystem(EngineDevice& device, VkRenderPass renderPass) : lveDevice{device}
+	RenderSystem::RenderSystem(Device& device, VkRenderPass renderPass) : lveDevice{device}
 	{
 		CreatePipelineLayout();
 		CreatePipeline(renderPass);
@@ -55,7 +55,7 @@ namespace Goss
 		}
 	}
 
-	void RenderSystem::CreatePipeline(VkRenderPass renderPass)
+	void RenderSystem::CreatePipeline(const VkRenderPass renderPass)
 	{
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
@@ -70,18 +70,18 @@ namespace Goss
 			pipelineConfig);
 	}
 
-	void RenderSystem::RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects) const
+	void RenderSystem::RenderGameObjects(const VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects) const
 	{
 		lvePipeline->Bind(commandBuffer);
 
-		for (GameObject& obj : gameObjects)
+		for (GameObject& gameObject : gameObjects)
 		{
-			obj.transform.rotation = glm::mod(obj.transform.rotation + 0.01f, glm::two_pi<float>());
+			gameObject.transform.rotation = glm::mod(gameObject.transform.rotation + 0.01f, glm::two_pi<float>());
 
 			ConstantData push{};
-			push.offset = obj.transform.translation;
-			push.color = obj.color;
-			push.transform = obj.transform.Mat2();
+			push.offset = gameObject.transform.translation;
+			push.color = gameObject.color;
+			push.transform = gameObject.transform.Mat2();
 
 			vkCmdPushConstants(
 				commandBuffer,
@@ -90,8 +90,9 @@ namespace Goss
 				0,
 				sizeof(ConstantData),
 				&push);
-			obj.model->Bind(commandBuffer);
-			obj.model->Draw(commandBuffer);
+
+			gameObject.model->Bind(commandBuffer);
+			gameObject.model->Draw(commandBuffer);
 		}
 	}
 }

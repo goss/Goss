@@ -1,5 +1,5 @@
 #pragma once
-#include "EngineDevice.h"
+#include "Device.h"
 
 namespace Goss
 {
@@ -29,7 +29,7 @@ namespace Goss
 	class Pipeline
 	{
 	public:
-		Pipeline(EngineDevice& device, const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo);
+		Pipeline(Device& device, const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo);
 		~Pipeline();
 
 		Pipeline(const Pipeline&) = delete;
@@ -46,7 +46,7 @@ namespace Goss
 
 		static void EnableAlphaBlending(PipelineConfigInfo& configInfo);
 
-		EngineDevice& engineDevice;
+		Device& engineDevice;
 		VkPipeline graphicsPipeline;
 		VkShaderModule vertShaderModule;
 		VkShaderModule fragShaderModule;

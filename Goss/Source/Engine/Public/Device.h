@@ -22,7 +22,7 @@ namespace Goss
 		bool IsComplete() const { return graphicsFamilyHasValue && presentFamilyHasValue; }
 	};
 
-	class EngineDevice
+	class Device
 	{
 	public:
 #ifdef NDEBUG
@@ -31,12 +31,12 @@ namespace Goss
 		const bool enableValidationLayers = true;
 #endif
 
-		explicit EngineDevice(ApplicationWindow& window);
-		~EngineDevice();
+		explicit Device(ApplicationWindow& window);
+		~Device();
 
 		// Not copyable or movable
-		EngineDevice(const EngineDevice&) = delete;
-		EngineDevice& operator=(const EngineDevice&) = delete;
+		Device(const Device&) = delete;
+		Device& operator=(const Device&) = delete;
 
 		VkCommandPool GetCommandPool() const { return commandPool; }
 		VkDevice GetDevice() const { return vkDevice; }

@@ -10,7 +10,7 @@
 
 namespace Goss
 {
-	Pipeline::Pipeline(EngineDevice& device, const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo):
+	Pipeline::Pipeline(Device& device, const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo):
 		engineDevice(device), graphicsPipeline(nullptr), vertShaderModule(nullptr), fragShaderModule(nullptr)
 	{
 		CreateGraphicsPipeline(vertFilepath, fragFilepath, configInfo);

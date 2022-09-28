@@ -13,7 +13,7 @@ namespace Goss
 	class Renderer
 	{
 	public:
-		Renderer(ApplicationWindow& window, EngineDevice& device);
+		Renderer(ApplicationWindow& window, Device& device);
 		~Renderer();
 
 		Renderer(const Renderer&) = delete;
@@ -36,16 +36,17 @@ namespace Goss
 
 		VkCommandBuffer BeginFrame();
 		void EndFrame();
-		void BeginSwapChainRenderPass(VkCommandBuffer commandBuffer);
-		void EndSwapChainRenderPass(VkCommandBuffer commandBuffer);
+
+		void BeginSwapChainRenderPass(VkCommandBuffer commandBuffer) const;
+		void EndSwapChainRenderPass(VkCommandBuffer commandBuffer) const;
 
 	private:
 		void CreateCommandBuffers();
 		void FreeCommandBuffers();
 		void RecreateSwapChain();
 
-		ApplicationWindow& appWindow;
-		EngineDevice& device;
+		ApplicationWindow& window;
+		Device& device;
 		std::unique_ptr<SwapChain> swapChain;
 		std::vector<VkCommandBuffer> commandBuffers;
 

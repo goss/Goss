@@ -7,7 +7,7 @@
 
 namespace Goss
 {
-	Renderer::Renderer(ApplicationWindow& window, EngineDevice& device) : appWindow{window}, device{device}
+	Renderer::Renderer(ApplicationWindow& window, Device& device) : window{window}, device{device}
 	{
 		RecreateSwapChain();
 		CreateCommandBuffers();
@@ -17,10 +17,10 @@ namespace Goss
 
 	void Renderer::RecreateSwapChain()
 	{
-		VkExtent2D extent = appWindow.GetExtent();
+		VkExtent2D extent = window.GetExtent();
 		while (extent.width == 0 || extent.height == 0)
 		{
-			extent = appWindow.GetExtent();
+			extent = window.GetExtent();
 			glfwWaitEvents();
 		}
 		vkDeviceWaitIdle(device.GetDevice());
@@ -108,9 +108,9 @@ namespace Goss
 
 		const VkResult result = swapChain->SubmitCommandBuffers(&commandBuffer, &currentImageIndex);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-			appWindow.WasWindowResized())
+			window.WasWindowResized())
 		{
-			appWindow.ResetResizedFlag();
+			window.ResetResizedFlag();
 			RecreateSwapChain();
 		}
 		else if (result != VK_SUCCESS)
@@ -122,7 +122,7 @@ namespace Goss
 		currentFrameIndex = (currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
 	}
 
-	void Renderer::BeginSwapChainRenderPass(const VkCommandBuffer commandBuffer)
+	void Renderer::BeginSwapChainRenderPass(const VkCommandBuffer commandBuffer) const
 	{
 		assert(isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
 		assert(commandBuffer == GetCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
@@ -156,7 +156,7 @@ namespace Goss
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 	}
 
-	void Renderer::EndSwapChainRenderPass(VkCommandBuffer commandBuffer)
+	void Renderer::EndSwapChainRenderPass(const VkCommandBuffer commandBuffer) const
 	{
 		assert(isFrameStarted && "Can't call endSwapChainRenderPass if frame is not in progress");
 		assert(commandBuffer == GetCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame");

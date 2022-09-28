@@ -7,12 +7,12 @@
 
 namespace Goss
 {
-	SwapChain::SwapChain(EngineDevice& deviceRef, VkExtent2D extent) : device{deviceRef}, windowExtent{extent}
+	SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : device{deviceRef}, windowExtent{extent}
 	{
 		Init();
 	}
 
-	SwapChain::SwapChain(EngineDevice& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous):
+	SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous):
 		device(deviceRef), windowExtent{extent}, oldSwapChain(std::move(previous))
 	{
 		Init();
