@@ -163,6 +163,8 @@
     <ClCompile Include="Source\Engine\Private\Bootstrap.cpp" />
     <ClCompile Include="Source\Engine\Private\EngineDevice.cpp" />
     <ClCompile Include="Source\Engine\Private\Model.cpp" />
+    <ClCompile Include="Source\Engine\Private\Renderer.cpp" />
+    <ClCompile Include="Source\Engine\Private\RenderSystem.cpp" />
     <ClCompile Include="Source\Goss.cpp" />
     <ClCompile Include="Source\Engine\Private\Pipeline.cpp" />
     <ClCompile Include="Source\Engine\Private\SwapChain.cpp" />
@@ -174,6 +176,8 @@
     <ClInclude Include="Source\Engine\Public\GameObject.h" />
     <ClInclude Include="Source\Engine\Public\Model.h" />
     <ClInclude Include="Source\Engine\Public\Pipeline.h" />
+    <ClInclude Include="Source\Engine\Public\Renderer.h" />
+    <ClInclude Include="Source\Engine\Public\RenderSystem.h" />
     <ClInclude Include="Source\Engine\Public\SwapChain.h" />
     <ClInclude Include="Source\Engine\Public\Transform.h" />
   </ItemGroup>

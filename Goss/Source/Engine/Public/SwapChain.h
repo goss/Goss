@@ -38,6 +38,12 @@ namespace Goss
 		VkResult AcquireNextImage(uint32_t* imageIndex) const;
 		VkResult SubmitCommandBuffers(const VkCommandBuffer* buffers, const uint32_t* imageIndex);
 
+		bool CompareSwapFormats(const SwapChain &inSwapChain) const
+		{
+			return inSwapChain.swapChainDepthFormat == swapChainDepthFormat &&
+			       inSwapChain.swapChainImageFormat == swapChainImageFormat;
+		}
+
 	private:
 		void Init();
 		void CreateSwapChain();
@@ -53,6 +59,7 @@ namespace Goss
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const;
 
 		VkFormat swapChainImageFormat;
+		VkFormat swapChainDepthFormat;
 		VkExtent2D swapChainExtent{};
 
 		std::vector<VkFramebuffer> swapChainFrameBuffers;

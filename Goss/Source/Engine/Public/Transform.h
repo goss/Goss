@@ -5,6 +5,9 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 
+/**
+ * i(i, 0) j(0, i) i=scale
+ */
 namespace Goss
 {
 	struct Transform
@@ -17,6 +20,7 @@ namespace Goss
 		{
 			const float s = glm::sin(rotation);
 			const float c = glm::cos(rotation);
+
 			const glm::mat2 rotMatrix{{c, s}, {-s, c}};
 			const glm::mat2 scaleMat{{scale.x, .0f}, {.0f, scale.y}};
 

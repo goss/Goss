@@ -1,9 +1,6 @@
 #pragma once
 #include "EngineDevice.h"
 
-// std
-#include <vector>
-
 namespace Goss
 {
 	struct PipelineConfigInfo
