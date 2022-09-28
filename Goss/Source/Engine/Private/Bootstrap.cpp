@@ -1,14 +1,34 @@
 #include "Bootstrap.h"
 
+// glm
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+
 // std
 #include <array>
+#include <ctime>
 #include <stdexcept>
+
+#include "GameObject.h"
 
 namespace Goss
 {
+	/**
+	 * Limited Constant data size is 128 bytes
+	 * Used for instancing
+	 */
+	struct ConstantData
+	{
+		glm::mat2 transform{1.0f};
+		glm::vec2 offset;
+		alignas(16) glm::vec3 color;
+	};
+
 	Bootstrap::Bootstrap()
 	{
-		LoadModels();
+		LoadGameObjects();
 		CreatePipelineLayout();
 		CreateSwapChain();
 		CreateCommandBuffers();
@@ -30,7 +50,7 @@ namespace Goss
 		vkDeviceWaitIdle(engineDevice.GetDevice());
 	}
 
-	void Bootstrap::LoadModels()
+	void Bootstrap::LoadGameObjects()
 	{
 		std::vector<Model::Vertex> vertices
 		{
@@ -39,7 +59,15 @@ namespace Goss
 			{{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
 		};
 		//Sierpinski(vertices, 3, {-0.5f, 0.5f}, {0.5f, 0.5f}, {0.0f, -0.5f});
-		model = std::make_unique<Model>(engineDevice, vertices);
+
+		GameObject triangle = GameObject::CreateGameObject();
+		triangle.model = std::make_unique<Model>(engineDevice, vertices);
+		triangle.color = {.1f, .8f, .1f};
+		triangle.transform.translation.x = .2f;
+		triangle.transform.scale = {2.f, .5f};
+		triangle.transform.rotation = .25f * glm::two_pi<float>();
+
+		gameObjects.push_back(std::move(triangle));
 	}
 
 	void Bootstrap::Sierpinski(std::vector<Model::Vertex>& vertices, const int depth, const glm::vec2 left, const glm::vec2 right, const glm::vec2 top)
@@ -63,12 +91,17 @@ namespace Goss
 
 	void Bootstrap::CreatePipelineLayout()
 	{
+		VkPushConstantRange pushConstantRange;
+		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+		pushConstantRange.offset = 0;
+		pushConstantRange.size = sizeof(ConstantData);
+
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 		pipelineLayoutInfo.setLayoutCount = 0;
 		pipelineLayoutInfo.pSetLayouts = nullptr;
-		pipelineLayoutInfo.pushConstantRangeCount = 0;
-		pipelineLayoutInfo.pPushConstantRanges = nullptr;
+		pipelineLayoutInfo.pushConstantRangeCount = 1;
+		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 		if (vkCreatePipelineLayout(engineDevice.GetDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create pipeline layout!");
@@ -172,7 +205,7 @@ namespace Goss
 		}
 	}
 
-	void Bootstrap::RecordCommandBuffer(const uint32_t imageIndex) const
+	void Bootstrap::RecordCommandBuffer(const uint32_t imageIndex)
 	{
 		VkCommandBuffer_T* commandBuffer = commandBuffers[imageIndex];
 
@@ -192,7 +225,7 @@ namespace Goss
 		renderPassInfo.renderArea.extent = swapChain->GetSwapChainExtent();
 
 		std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = {{0.1f, 0.1f, 0.1f, 1.0f}};
+		clearValues[0].color = {{0.01f, 0.01f, 0.01f, 1.0f}};
 		clearValues[1].depthStencil = {1.0f, 0};
 
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -205,9 +238,7 @@ namespace Goss
 		vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		pipeline->Bind(commandBuffer);
-		model->Bind(commandBuffer);
-		model->Draw(commandBuffer);
+		RenderGameObjects(commandBuffer);
 
 		vkCmdEndRenderPass(commandBuffer);
 
@@ -216,4 +247,23 @@ namespace Goss
 			throw std::runtime_error("Failed to record command buffer!");
 		}
 	}
+
+	void Bootstrap::RenderGameObjects(const VkCommandBuffer commandBuffer)
+	{
+		pipeline->Bind(commandBuffer);
+
+		for (GameObject& obj : gameObjects) 
+		{
+			obj.transform.rotation = glm::mod(obj.transform.rotation + 0.01f, glm::two_pi<float>());
+
+			ConstantData push{};
+			push.offset = obj.transform.translation;
+			push.color = obj.color;
+			push.transform = obj.transform.Mat2();
+			vkCmdPushConstants(commandBuffer,pipelineLayout,VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,0,sizeof(ConstantData), &push);
+
+			obj.model->Bind(commandBuffer);
+			obj.model->Draw(commandBuffer);
+		}
+}
 }

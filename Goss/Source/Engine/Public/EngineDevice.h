@@ -68,7 +68,7 @@ namespace Goss
 		void CreateLogicalDevice();
 		void CreateCommandPool();
 
-		// helper functions
+		// Helper functions
 		bool IsDeviceSuitable(VkPhysicalDevice device) const;
 		std::vector<const char*> GetRequiredExtensions() const;
 		bool CheckValidationLayerSupport() const;

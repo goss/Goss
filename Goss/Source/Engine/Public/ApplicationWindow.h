@@ -28,9 +28,9 @@ namespace Goss
 
 		bool WasWindowResized() const { return framebufferResized;}
 		void ResetResizedFlag() { framebufferResized = false;}
+
 	private:
 		static void FramebufferResizedCallback(GLFWwindow *window, int width, int height);
-
 	};
 }
 

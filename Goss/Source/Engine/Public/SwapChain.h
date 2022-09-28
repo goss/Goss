@@ -21,7 +21,7 @@ namespace Goss
 
 		VkFramebuffer GetFrameBuffer(const uint32_t index) const { return swapChainFrameBuffers[index]; }
 		VkRenderPass GetRenderPass() const { return renderPass; }
-		VkImageView GetImageView(const int index) const { return swapChainImageViews[index]; }
+		VkImageView GetImageView(const uint32_t index) const { return swapChainImageViews[index]; }
 		size_t ImageCount() const { return swapChainImages.size(); }
 		VkFormat GetSwapChainImageFormat() const { return swapChainImageFormat; }
 		VkExtent2D GetSwapChainExtent() const { return swapChainExtent; }
@@ -68,6 +68,7 @@ namespace Goss
 		VkExtent2D windowExtent;
 
 		VkSwapchainKHR swapChain{};
+
 		std::shared_ptr<SwapChain> oldSwapChain;
 
 		std::vector<VkSemaphore> imageAvailableSemaphores;

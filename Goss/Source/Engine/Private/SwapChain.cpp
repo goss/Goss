@@ -63,7 +63,7 @@ namespace Goss
 
 	VkResult SwapChain::AcquireNextImage(uint32_t* imageIndex) const
 	{
-		vkWaitForFences(device.GetDevice(),1, &inFlightFences[currentFrame],VK_TRUE,std::numeric_limits<uint64_t>::max());
+		vkWaitForFences(device.GetDevice(), 1, &inFlightFences[currentFrame],VK_TRUE,std::numeric_limits<uint64_t>::max());
 
 		const VkResult result = vkAcquireNextImageKHR(device.GetDevice(), swapChain,
 			std::numeric_limits<uint64_t>::max(),imageAvailableSemaphores[currentFrame], // must be a not signaled semaphore

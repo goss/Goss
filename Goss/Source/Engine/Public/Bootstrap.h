@@ -2,16 +2,19 @@
 
 #include "ApplicationWindow.h"
 #include "EngineDevice.h"
+#include "Model.h"
 #include "Pipeline.h"
 #include "SwapChain.h"
-#include "Model.h"
 
 // std
 #include <memory>
 #include <vector>
 
+
 namespace Goss
 {
+	class GameObject;
+
 	class Bootstrap
 	{
 	public:
@@ -27,14 +30,15 @@ namespace Goss
 		void Run();
 
 	private:
-		void LoadModels();
+		void LoadGameObjects();
 		void CreatePipelineLayout();
 		void CreatePipeline();
+		void CreateSwapChain();
 		void CreateCommandBuffers();
 		void FreeCommandBuffers();
 		void DrawFrame();
-		void CreateSwapChain();
-		void RecordCommandBuffer(uint32_t imageIndex) const;
+		void RecordCommandBuffer(uint32_t imageIndex);
+		void RenderGameObjects(VkCommandBuffer commandBuffer);
 
 		static void Sierpinski(std::vector<Model::Vertex>& vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top);
 
@@ -45,6 +49,6 @@ namespace Goss
 		std::unique_ptr<Pipeline> pipeline;
 		VkPipelineLayout pipelineLayout{};
 		std::vector<VkCommandBuffer> commandBuffers;
-		std::unique_ptr<Model> model;
+		std::vector<GameObject> gameObjects;
 	};
 }
