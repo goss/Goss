@@ -1,4 +1,5 @@
 #pragma once
+#include "Camera.h"
 #include "GameObject.h"
 #include "Pipeline.h"
 
@@ -13,7 +14,7 @@ namespace Goss
 		RenderSystem(const RenderSystem &) = delete;
 		RenderSystem &operator=(const RenderSystem &) = delete;
 
-		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects) const;
+		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects, const Camera& camera) const;
 
 		private:
 		void CreatePipelineLayout();

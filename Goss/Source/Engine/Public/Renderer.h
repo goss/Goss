@@ -21,6 +21,7 @@ namespace Goss
 
 		VkRenderPass GetSwapChainRenderPass() const { return swapChain->GetRenderPass(); }
 		bool IsFrameInProgress() const { return isFrameStarted; }
+		float GetAspectRatio() const { return swapChain->ExtentAspectRatio(); }
 
 		VkCommandBuffer GetCurrentCommandBuffer() const
 		{

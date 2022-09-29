@@ -107,8 +107,7 @@ namespace Goss
 		}
 
 		const VkResult result = swapChain->SubmitCommandBuffers(&commandBuffer, &currentImageIndex);
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
-			window.WasWindowResized())
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.WasWindowResized())
 		{
 			window.ResetResizedFlag();
 			RecreateSwapChain();

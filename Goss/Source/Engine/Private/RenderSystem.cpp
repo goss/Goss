@@ -66,9 +66,11 @@ namespace Goss
 			pipelineConfig);
 	}
 
-	void RenderSystem::RenderGameObjects(const VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects) const
+	void RenderSystem::RenderGameObjects(const VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) const
 	{
 		lvePipeline->Bind(commandBuffer);
+
+		const auto projectionView = camera.GetProjection() * camera.GetView();
 
 		for (GameObject& gameObject : gameObjects)
 		{
@@ -76,7 +78,7 @@ namespace Goss
 
 			PushConstantData push{};
 			push.color = gameObject.color;
-			push.transform = gameObject.transform.Mat4();
+			push.transform = projectionView * gameObject.transform.Mat4();
 
 			vkCmdPushConstants(
 				commandBuffer,
