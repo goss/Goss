@@ -6,7 +6,7 @@
 
 namespace Goss
 {
-	class ApplicationWindow
+	class Window
 	{
 	    GLFWwindow* window = nullptr;
 
@@ -15,11 +15,11 @@ namespace Goss
 		bool framebufferResized = false;
 
 	public:
-	    ApplicationWindow(int width, int height, const char* name);
-	    ~ApplicationWindow();
+	    Window(int width, int height, const char* name);
+	    ~Window();
 
-	    ApplicationWindow(const ApplicationWindow &) = delete;
-	    ApplicationWindow &operator=(const ApplicationWindow &) = delete;
+	    Window(const Window &) = delete;
+	    Window &operator=(const Window &) = delete;
 
 		bool ShouldClose() const { return glfwWindowShouldClose(window);}
 		VkExtent2D GetExtent() const { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }

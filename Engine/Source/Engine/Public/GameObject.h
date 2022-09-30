@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Transform.h"
 #include "Model.h"
 

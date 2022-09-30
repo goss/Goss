@@ -3,8 +3,8 @@
 #include "Pipeline.h"
 
 // glm
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
+#include <glm.hpp>
+#include <gtc/constants.hpp>
 
 // std
 #include <stdexcept>

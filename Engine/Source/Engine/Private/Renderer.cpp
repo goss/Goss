@@ -7,7 +7,7 @@
 
 namespace Goss
 {
-	Renderer::Renderer(ApplicationWindow& window, Device& device) : window{window}, device{device}
+	Renderer::Renderer(Window& window, Device& device) : window{window}, device{device}
 	{
 		RecreateSwapChain();
 		CreateCommandBuffers();

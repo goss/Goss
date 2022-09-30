@@ -39,7 +39,7 @@ namespace Goss
 		}
 	}
 
-	Device::Device(ApplicationWindow& window) : window{window}
+	Device::Device(Window& window) : window{window}
 	{
 		CreateInstance();
 		SetupDebugMessenger();

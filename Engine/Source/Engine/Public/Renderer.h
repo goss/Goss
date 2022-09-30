@@ -1,5 +1,6 @@
 #pragma once
-#include "ApplicationWindow.h"
+
+#include "Window.h"
 #include "SwapChain.h"
 
 // std
@@ -13,7 +14,7 @@ namespace Goss
 	class Renderer
 	{
 	public:
-		Renderer(ApplicationWindow& window, Device& device);
+		Renderer(Window& window, Device& device);
 		~Renderer();
 
 		Renderer(const Renderer&) = delete;
@@ -46,7 +47,7 @@ namespace Goss
 		void FreeCommandBuffers();
 		void RecreateSwapChain();
 
-		ApplicationWindow& window;
+		Window& window;
 		Device& device;
 		std::unique_ptr<SwapChain> swapChain;
 		std::vector<VkCommandBuffer> commandBuffers;

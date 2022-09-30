@@ -1,5 +1,5 @@
 #pragma once
-#include "ApplicationWindow.h"
+#include "Window.h"
 
 // std
 #include <vector>
@@ -31,7 +31,7 @@ namespace Goss
 		const bool enableValidationLayers = true;
 #endif
 
-		explicit Device(ApplicationWindow& window);
+		explicit Device(Window& window);
 		~Device();
 
 		// Not copyable or movable
@@ -78,7 +78,7 @@ namespace Goss
 		bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const;
 		SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device) const;
 
-		ApplicationWindow& window;
+		Window& window;
 
 		VkInstance instance{};
 		VkDebugUtilsMessengerEXT debugMessenger{};

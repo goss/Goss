@@ -1,18 +1,17 @@
 #pragma once
-
-#include "ApplicationWindow.h"
 #include "Device.h"
+#include "GameObject.h"
 #include "Model.h"
 #include "Renderer.h"
+#include "Window.h"
 
 // std
 #include <chrono>
 #include <vector>
 
+
 namespace Goss
 {
-	class GameObject;
-
 	class Bootstrap
 	{
 	public:
@@ -32,7 +31,7 @@ namespace Goss
 
 		std::unique_ptr<Model> CreateCubeModel(glm::vec3 offset);
 
-		ApplicationWindow window{WIDTH, HEIGHT, "Goss"};
+		Window window{WIDTH, HEIGHT, "Goss"};
 		Device device{window};
 		Renderer renderer{window, device};
 

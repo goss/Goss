@@ -7,8 +7,10 @@
 // glm
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm.hpp>
+
+// std
 #include <iostream>
-#include <glm/glm.hpp>
 
 namespace Goss
 {
@@ -42,7 +44,7 @@ namespace Goss
 				accumulator -= deltaTime;
 			}
 
-			std::cout << frameTime << std::endl;
+			//std::cout << frameTime << std::endl;
 
 			renderSystem.Tick(frameTime , gameObjects);
 	

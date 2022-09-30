@@ -1,11 +1,11 @@
-#include "ApplicationWindow.h"
+#include "Window.h"
 
 #include <glfw3.h>
 #include <iostream>
 
 namespace Goss
 {
-	ApplicationWindow::ApplicationWindow(const int width, const int height, const char* name): width(width), height(height)
+	Window::Window(const int width, const int height, const char* name): width(width), height(height)
 	{
 		glfwInit();
 
@@ -20,13 +20,13 @@ namespace Goss
 		std::cout << "GLFW Version: " << glfwGetVersionString() << std::endl;
 	}
 
-	ApplicationWindow::~ApplicationWindow()
+	Window::~Window()
 	{
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
 
-	void ApplicationWindow::CreateWindowSurface(const VkInstance instance, VkSurfaceKHR* surface) const
+	void Window::CreateWindowSurface(const VkInstance instance, VkSurfaceKHR* surface) const
 	{
 		if (glfwCreateWindowSurface(instance, window, nullptr, surface))
 		{
@@ -34,9 +34,9 @@ namespace Goss
 		}
 	}
 
-	void ApplicationWindow::FramebufferResizedCallback(GLFWwindow* window, const int width, const int height)
+	void Window::FramebufferResizedCallback(GLFWwindow* window, const int width, const int height)
 	{
-		ApplicationWindow* appWindow = static_cast<ApplicationWindow*>(glfwGetWindowUserPointer(window));
+		Window* appWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
 		appWindow->framebufferResized = true;
 		appWindow->width = width;
 		appWindow->height = height;
