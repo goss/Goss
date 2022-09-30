@@ -1,4 +1,5 @@
 #include "RenderSystem.h"
+
 #include "Pipeline.h"
 
 // glm
@@ -66,7 +67,16 @@ namespace Goss
 			pipelineConfig);
 	}
 
-	void RenderSystem::RenderGameObjects(const VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) const
+	void RenderSystem::Tick(const float deltaTime, std::vector<GameObject>& gameObjects) const
+	{
+		for (GameObject& gameObject : gameObjects)
+		{
+			gameObject.transform.rotation.x = glm::mod(gameObject.transform.rotation.x + (0.1f * deltaTime), glm::two_pi<float>());
+			gameObject.transform.rotation.y = glm::mod(gameObject.transform.rotation.y + (0.1f * deltaTime), glm::two_pi<float>());
+		}
+	}
+
+	void RenderSystem::Render(const VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) const
 	{
 		lvePipeline->Bind(commandBuffer);
 
@@ -74,8 +84,6 @@ namespace Goss
 
 		for (GameObject& gameObject : gameObjects)
 		{
-			gameObject.transform.rotation = mod(gameObject.transform.rotation + 0.0001f, glm::two_pi<float>());
-
 			PushConstantData push{};
 			push.color = gameObject.color;
 			push.transform = projectionView * gameObject.transform.Mat4();

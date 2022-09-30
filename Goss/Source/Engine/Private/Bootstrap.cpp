@@ -1,13 +1,14 @@
 #include "Bootstrap.h"
+
+#include "Camera.h"
 #include "GameObject.h"
 #include "RenderSystem.h"
 
 // glm
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <iostream>
 #include <glm/glm.hpp>
-
-#include "Camera.h"
 
 namespace Goss
 {
@@ -24,10 +25,27 @@ namespace Goss
 		camera.SetViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
 
 		const RenderSystem renderSystem{device, renderer.GetSwapChainRenderPass()};
+
+		currentTime = std::chrono::high_resolution_clock::now();
 		while (!window.ShouldClose())
 		{
 			glfwPollEvents();
 
+			const auto newTime = std::chrono::high_resolution_clock::now();
+			frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+			currentTime = newTime;
+			accumulator += frameTime;
+
+			while(accumulator >= deltaTime)
+			{
+				elapsedTime += deltaTime;
+				accumulator -= deltaTime;
+			}
+
+			std::cout << frameTime << std::endl;
+
+			renderSystem.Tick(frameTime , gameObjects);
+	
 			const float aspect = renderer.GetAspectRatio();
 			//camera.SetOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
 			camera.SetPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 100.f);
@@ -35,7 +53,7 @@ namespace Goss
 			if (const VkCommandBuffer commandBuffer = renderer.BeginFrame()) 
 			{
 				renderer.BeginSwapChainRenderPass(commandBuffer);
-				renderSystem.RenderGameObjects(commandBuffer, gameObjects, camera);
+				renderSystem.Render(commandBuffer, gameObjects, camera);
 				renderer.EndSwapChainRenderPass(commandBuffer);
 				renderer.EndFrame();
 			}

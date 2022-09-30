@@ -6,6 +6,7 @@
 #include "Renderer.h"
 
 // std
+#include <chrono>
 #include <vector>
 
 namespace Goss
@@ -36,5 +37,14 @@ namespace Goss
 		Renderer renderer{window, device};
 
 		std::vector<GameObject> gameObjects;
+
+		//game timer
+		std::chrono::time_point<std::chrono::steady_clock> currentTime;
+
+		const float deltaTime = 0.01f;
+		float frameTime = 0.0f;
+		float accumulator = 0.0f;
+
+		float elapsedTime = 0.0;
 	};
 }

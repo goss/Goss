@@ -14,7 +14,8 @@ namespace Goss
 		RenderSystem(const RenderSystem &) = delete;
 		RenderSystem &operator=(const RenderSystem &) = delete;
 
-		void RenderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects, const Camera& camera) const;
+		void Tick(float deltaTime, std::vector<GameObject>& gameObjects) const;
+		void Render(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects, const Camera& camera) const;
 
 		private:
 		void CreatePipelineLayout();

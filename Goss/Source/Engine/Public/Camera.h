@@ -7,6 +7,9 @@
 
 namespace Goss
 {
+	/**
+	 * Tait–Bryan YXZ
+	 */
 	class Camera
 	{
 	public:
