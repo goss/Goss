@@ -1,7 +1,7 @@
 #pragma once
 #include "Core.h"
 
-//#include "Bootstrap.h"
+#include "Bootstrap.h"
 
 namespace Goss
 {
@@ -15,7 +15,7 @@ namespace Goss
 		void Run();
 
 	private:
-		//Bootstrap bootstrap{};
+		Bootstrap bootstrap{};
 	};
 
 	Application* CreateApplication();

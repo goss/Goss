@@ -62,8 +62,8 @@ namespace Goss
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		lvePipeline = std::make_unique<Pipeline>(
 			lveDevice,
-			"shaders/simple_shader.vert.spv",
-			"shaders/simple_shader.frag.spv",
+			"../engine/shaders/simple_shader.vert.spv",
+			"../engine/shaders/simple_shader.frag.spv",
 			pipelineConfig);
 	}
 

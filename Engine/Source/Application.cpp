@@ -1,4 +1,4 @@
-	#include "Application.h"
+#include "Application.h"
 
 namespace Goss
 {
@@ -7,7 +7,8 @@ namespace Goss
 
 	void Application::Run()
 	{
-		//bootstrap.Run();
+		bootstrap.Run();
+
 	}
 }
 

@@ -32,6 +32,8 @@ namespace Goss
 	std::vector<char> Pipeline::ReadFile(const char* filepath)
 	{
 		std::ifstream file = std::ifstream(filepath, std::ios::ate | std::ios::binary);
+		std::cout << filepath << std::endl;
+
 		if(file.is_open())
 		{
 			const std::streamsize fileSize = file.tellg();
@@ -42,6 +44,7 @@ namespace Goss
 			file.close();
 			return buffer;
 		}
+
 		throw std::runtime_error(std::string("Failed to open file: ").append(filepath));
 	}
 
