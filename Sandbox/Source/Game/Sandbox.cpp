@@ -2,11 +2,10 @@
 
 class Sandbox : public Goss::Application
 {
-public:
-	~Sandbox() override = default;
 };
 
 Goss::Application* Goss::CreateApplication()
 {
+	GE_WARN("Creating Sandbox");
 	return new Sandbox();
 }

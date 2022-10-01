@@ -9,7 +9,6 @@
 #include <chrono>
 #include <vector>
 
-
 namespace Goss
 {
 	class Bootstrap

@@ -1,3 +1,5 @@
+#include "Log.h"
+
 #include "Bootstrap.h"
 
 #include "Camera.h"
@@ -9,14 +11,14 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm.hpp>
 
-// std
-#include <iostream>
 
 namespace Goss
 {
 	Bootstrap::Bootstrap()
 	{
+		Log::Init();
 		LoadGameObjects();
+		GE_CORE_WARN("Bootstrap Initializing");
 	}
 
 	Bootstrap::~Bootstrap() = default;

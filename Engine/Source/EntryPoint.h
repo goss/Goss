@@ -1,12 +1,14 @@
 #pragma once
+
+#include "Log.h"
+#include "Application.h"
+
+// std
 #include <iostream>
 #include <ostream>
 
-#include "Application.h"
-
 #ifdef  GE_PLATFORM_WINDOWS
 
-extern Goss::Application* Goss::CreateApplication();
 
 int main(int argc, char** argv)
 {
