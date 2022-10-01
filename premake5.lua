@@ -1,4 +1,5 @@
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+vulkandir = os.getenv("VULKAN_SDK")
 
 workspace "Goss"
 	architecture "x64"
@@ -20,12 +21,21 @@ project "Engine"
 	files
 	{
 		"%{prj.name}/Source/**.h",
-		"{prj.name}/Source/**.cpp",
+		"%{prj.name}/Source/**.cpp"
 	}
 
 	includedirs
 	{
+		"Source",
+		"" .. vulkandir .. "/include",
+		"%{prj.name}/ThirdParty/glm/glm",
 		"%{prj.name}/ThirdParty/spdlog/include"
+	}
+	
+	links
+	{
+		"GLFW",
+		"vulkan-1.lib"
 	}
 
 	defines
@@ -67,11 +77,14 @@ project "Sandbox"
 	files
 	{
 		"%{prj.name}/Source/**.h",
-		"{prj.name}/Source/**.cpp",
+		"%{prj.name}/Source/**.cpp"
 	}
 
 	includedirs
 	{
+		"Source",
+		"" .. vulkandir .. "/include",
+		"%{prj.name}/ThirdParty/glm/glm",
 		"%{prj.name}/ThirdParty/spdlog/include"
 	}
 
