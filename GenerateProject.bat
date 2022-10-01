@@ -1,2 +1,2 @@
-call Build\Premake5.exe vs2019
+call Build\Premake5\premake5.exe vs2019
 PAUSE

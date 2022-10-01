@@ -1,5 +1,14 @@
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+workspace "Goss"
+	architecture "x64"
+	
+	configurations
+	{
+		"Debug",
+		"Release"
+	}
+	
 project "Engine"
 	location "Engine"
 	kind "StaticLib"
@@ -27,25 +36,24 @@ project "Engine"
 		"GE_BUILD_DLL"
 	}
 
-	filter "system:windows"
-	{
-		cppdialect "C++17"
-		staticruntime "On"
-		systemverison "Latest"
-	}
-
-	postbuildscomands
+	postbuildcommands
 	{
 		("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox");
 	}
 
+	filter "system:windows"
+		cppdialect "C++17"
+		staticruntime "On"
+		systemversion "latest"
+	
+	
 	filter "configurations:Debug"
 		defines "GE_DEBUG"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "GE_RELEASE"
-		optmize "On"
+		optimize "On"
 
 
 project "Sandbox"
@@ -80,11 +88,10 @@ project "Sandbox"
 	}
 
 	filter "system:windows"
-	{
 		cppdialect "C++17"
 		staticruntime "On"
-		systemverison "Latest"
-	}
+		systemversion "latest"
+	
 
 	filter "configurations:Debug"
 		defines "GE_DEBUG"
@@ -92,4 +99,4 @@ project "Sandbox"
 
 	filter "configurations:Release"
 		defines "GE_RELEASE"
-		optmize "On"
+		optimize "On"
