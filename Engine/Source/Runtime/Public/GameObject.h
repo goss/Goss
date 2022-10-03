@@ -2,8 +2,6 @@
 #include "Transform.h"
 #include "Model.h"
 
-#include <memory>
-
 namespace Goss
 {
 	class GameObject

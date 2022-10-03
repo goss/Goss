@@ -1,13 +1,10 @@
 #pragma once
+
 #include "Device.h"
 #include "GameObject.h"
 #include "Model.h"
 #include "Renderer.h"
 #include "Window.h"
-
-// std
-#include <chrono>
-#include <vector>
 
 namespace Goss
 {

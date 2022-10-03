@@ -1,8 +1,6 @@
-#include "Model.h"
+#include "gepch.h"
 
-// std
-#include <cassert>
-#include <cstring>
+#include "Model.h"
 
 namespace Goss
 {

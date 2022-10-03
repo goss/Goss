@@ -1,9 +1,6 @@
-#include "Renderer.h"
+#include "gepch.h"
 
-// std
-#include <array>
-#include <cassert>
-#include <stdexcept>
+#include "Renderer.h"
 
 namespace Goss
 {
@@ -70,8 +67,6 @@ namespace Goss
 
 	VkCommandBuffer Renderer::BeginFrame()
 	{
-		assert(!isFrameStarted && "Can't call beginFrame while already in progress");
-
 		const VkResult result = swapChain->AcquireNextImage(&currentImageIndex);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR)
 		{
@@ -99,7 +94,6 @@ namespace Goss
 
 	void Renderer::EndFrame()
 	{
-		assert(isFrameStarted && "Can't call endFrame while frame is not in progress");
 		const VkCommandBuffer commandBuffer = GetCurrentCommandBuffer();
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
 		{
@@ -123,9 +117,6 @@ namespace Goss
 
 	void Renderer::BeginSwapChainRenderPass(const VkCommandBuffer commandBuffer) const
 	{
-		assert(isFrameStarted && "Can't call beginSwapChainRenderPass if frame is not in progress");
-		assert(commandBuffer == GetCurrentCommandBuffer() && "Can't begin render pass on command buffer from a different frame");
-
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = swapChain->GetRenderPass();
@@ -142,7 +133,7 @@ namespace Goss
 
 		vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		VkViewport viewport;
+		VkViewport viewport{};
 		viewport.x = 0.0f;
 		viewport.y = 0.0f;
 		viewport.width = static_cast<float>(swapChain->GetSwapChainExtent().width);
@@ -157,8 +148,6 @@ namespace Goss
 
 	void Renderer::EndSwapChainRenderPass(const VkCommandBuffer commandBuffer) const
 	{
-		assert(isFrameStarted && "Can't call endSwapChainRenderPass if frame is not in progress");
-		assert(commandBuffer == GetCurrentCommandBuffer() && "Can't end render pass on command buffer from a different frame");
 		vkCmdEndRenderPass(commandBuffer);
 	}
 }

@@ -2,10 +2,6 @@
 #include "Window.h"
 #include "SwapChain.h"
 
-// std
-#include <cassert>
-#include <memory>
-#include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace Goss
@@ -25,13 +21,11 @@ namespace Goss
 
 		VkCommandBuffer GetCurrentCommandBuffer() const
 		{
-			assert(isFrameStarted && "Cannot get command buffer when frame not in progress");
 			return commandBuffers[currentFrameIndex];
 		}
 
 		int GetFrameIndex() const
 		{
-			assert(isFrameStarted && "Cannot get frame index when frame not in progress");
 			return currentFrameIndex;
 		}
 
@@ -51,8 +45,8 @@ namespace Goss
 		std::unique_ptr<SwapChain> swapChain;
 		std::vector<VkCommandBuffer> commandBuffers;
 
-		uint32_t currentImageIndex;
-		int currentFrameIndex;
+		uint32_t currentImageIndex = 0;
+		int currentFrameIndex = 0;
 		bool isFrameStarted;
 	};
 }

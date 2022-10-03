@@ -1,11 +1,19 @@
 #include <Engine.h>
 
-class Sandbox : public Goss::Application
+namespace Goss
 {
-};
+	class Sandbox final : public Application
+	{
+	public:
+		Sandbox() = default;
+		~Sandbox() override = default;
+	};
 
-Goss::Application* Goss::CreateApplication()
-{
-	GE_WARN("Creating Sandbox");
-	return new Sandbox();
+	Application* CreateApplication()
+	{
+		return new Sandbox();
+	}
 }
+
+
+

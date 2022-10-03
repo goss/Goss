@@ -1,8 +1,6 @@
-#include "Camera.h"
+#include "gepch.h"
 
-// std
-#include <cassert>
-#include <limits>
+#include "Camera.h"
 
 namespace Goss
 {

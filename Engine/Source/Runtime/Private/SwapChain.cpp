@@ -1,9 +1,6 @@
-#include "SwapChain.h"
+#include "gepch.h"
 
-// std
-#include <array>
-#include <iostream>
-#include <stdexcept>
+#include "SwapChain.h"
 
 namespace Goss
 {
@@ -60,10 +57,10 @@ namespace Goss
 
 	VkResult SwapChain::AcquireNextImage(uint32_t* imageIndex) const
 	{
-		vkWaitForFences(device.GetDevice(), 1, &inFlightFences[currentFrame],VK_TRUE,std::numeric_limits<uint64_t>::max());
+		vkWaitForFences(device.GetDevice(), 1, &inFlightFences[currentFrame],VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 		const VkResult result = vkAcquireNextImageKHR(device.GetDevice(), swapChain,
-			std::numeric_limits<uint64_t>::max(),imageAvailableSemaphores[currentFrame], // must be a not signaled semaphore
+			std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], // must be a not signaled semaphore
 			VK_NULL_HANDLE, imageIndex);
 
 		return result;
@@ -226,11 +223,11 @@ namespace Goss
 		depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-		VkAttachmentReference depthAttachmentRef;
+		VkAttachmentReference depthAttachmentRef{};
 		depthAttachmentRef.attachment = 1;
 		depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-		VkAttachmentDescription colorAttachment = {};
+		VkAttachmentDescription colorAttachment{};
 		colorAttachment.format = GetSwapChainImageFormat();
 		colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 		colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -240,17 +237,17 @@ namespace Goss
 		colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-		VkAttachmentReference colorAttachmentRef;
+		VkAttachmentReference colorAttachmentRef{};
 		colorAttachmentRef.attachment = 0;
 		colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-		VkSubpassDescription subpass = {};
+		VkSubpassDescription subpass{};
 		subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		subpass.colorAttachmentCount = 1;
 		subpass.pColorAttachments = &colorAttachmentRef;
 		subpass.pDepthStencilAttachment = &depthAttachmentRef;
 
-		VkSubpassDependency dependency = {};
+		VkSubpassDependency dependency{};
 		dependency.dstSubpass = 0;
 		dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
@@ -260,7 +257,7 @@ namespace Goss
 		dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 
 		const std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
-		VkRenderPassCreateInfo renderPassInfo = {};
+		VkRenderPassCreateInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 		renderPassInfo.pAttachments = attachments.data();

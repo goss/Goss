@@ -1,4 +1,4 @@
-#include "Log.h"
+#include "gepch.h"
 
 #include "Bootstrap.h"
 
@@ -11,14 +11,11 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm.hpp>
 
-
 namespace Goss
 {
 	Bootstrap::Bootstrap()
 	{
-		Log::Init();
 		LoadGameObjects();
-		GE_CORE_WARN("Bootstrap Initializing");
 	}
 
 	Bootstrap::~Bootstrap() = default;
@@ -45,8 +42,6 @@ namespace Goss
 				elapsedTime += deltaTime;
 				accumulator -= deltaTime;
 			}
-
-			//std::cout << frameTime << std::endl;
 
 			renderSystem.Tick(frameTime , gameObjects);
 	

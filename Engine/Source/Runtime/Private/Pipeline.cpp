@@ -1,13 +1,11 @@
+#include "gepch.h"
+
 #include "Pipeline.h"
+
+#include <fstream>
 
 #include "Model.h"
 
-// std
-#include <cassert>
-#include <fstream>
-#include <iostream>
-#include <stdexcept>
-#include <vector>
 
 namespace Goss
 {

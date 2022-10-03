@@ -1,9 +1,6 @@
 #pragma once
 #include "Window.h"
 
-// std
-#include <vector>
-
 namespace Goss
 {
 	struct SwapChainSupportDetails

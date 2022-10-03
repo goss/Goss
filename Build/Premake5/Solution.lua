@@ -12,8 +12,7 @@ workspace "Goss"
 	}
 	
 IncludeDir = {}
-IncludeDir["EngineSource"] = "%{wks.location}/Engine/Source/"
-IncludeDir["EngineRuntime"] = "%{wks.location}/Engine/Source/Runtime/Public"
+IncludeDir["Engine"] = "%{wks.location}/Engine/Source/Runtime"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 IncludeDir["GLFW"] = "%{wks.location}/Engine/ThirdParty/glfw/include"
 IncludeDir["GLM"] = "%{wks.location}/Engine/ThirdParty/glm/glm"
@@ -36,7 +35,7 @@ project "Engine"
 	objdir ("%{wks.location}/Intermediates/" .. outputdir .. "/%{prj.name}")
 
 	pchheader "gepch.h"
-	pchsource "Engine/Source/gepch.cpp"
+	pchsource "Engine/Source/Runtime/gepch.cpp"
 
 	files
 	{
@@ -46,8 +45,6 @@ project "Engine"
 
 	includedirs
 	{
-		"%{IncludeDir.EngineSource}",
-		"%{IncludeDir.EngineRuntime}",
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLM}",
@@ -106,7 +103,7 @@ project "Sandbox"
 
 	includedirs
 	{
-		"%{IncludeDir.EngineSource}",
+		"%{IncludeDir.Engine}",
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLM}",

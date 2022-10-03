@@ -1,9 +1,10 @@
 #pragma once
 
 #define GLFW_INCLUDE_VULKAN
-#include <glfw3.h>
+#include "GLFW/glfw3.h"
 
 #include <vulkan/vulkan_core.h>
+
 
 namespace Goss
 {

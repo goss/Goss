@@ -2,10 +2,6 @@
 
 #include "Device.h"
 
-// std
-#include <vector>
-#include <memory>
-
 namespace Goss
 {
 	class SwapChain

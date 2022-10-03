@@ -1,10 +1,9 @@
+#include "gepch.h"
+
 #include "Device.h"
 
-// std 
-#include <cstring>
-#include <iostream>
 #include <set>
-#include <unordered_set>
+
 
 namespace Goss
 {
@@ -509,7 +508,7 @@ namespace Goss
 	{
 		const VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
-		VkBufferCopy copyRegion;
+		VkBufferCopy copyRegion{};
 		copyRegion.srcOffset = 0; // Optional
 		copyRegion.dstOffset = 0; // Optional
 		copyRegion.size = size;
@@ -522,7 +521,7 @@ namespace Goss
 	{
 		const VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
-		VkBufferImageCopy region;
+		VkBufferImageCopy region{};
 		region.bufferOffset = 0;
 		region.bufferRowLength = 0;
 		region.bufferImageHeight = 0;

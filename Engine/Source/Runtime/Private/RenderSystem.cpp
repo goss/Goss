@@ -1,13 +1,11 @@
-#include "RenderSystem.h"
+#include "gepch.h"
 
+#include "RenderSystem.h"
 #include "Pipeline.h"
 
 // glm
 #include <glm.hpp>
 #include <gtc/constants.hpp>
-
-// std
-#include <stdexcept>
 
 namespace Goss
 {
@@ -34,7 +32,7 @@ namespace Goss
 
 	void RenderSystem::CreatePipelineLayout()
 	{
-		VkPushConstantRange pushConstantRange;
+		VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
 		pushConstantRange.size = sizeof(PushConstantData);
