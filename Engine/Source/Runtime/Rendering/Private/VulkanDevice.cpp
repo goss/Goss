@@ -1,9 +1,9 @@
 #include "gepch.h"
 
-#include "Device.h"
+#include "VulkanDevice.h"
+#include "Log.h"
 
 #include <set>
-
 
 namespace Goss
 {
@@ -38,7 +38,7 @@ namespace Goss
 		}
 	}
 
-	Device::Device(Window& window) : window{window}
+	VulkanDevice::VulkanDevice(VulkanWindow& window) : window{window}
 	{
 		CreateInstance();
 		SetupDebugMessenger();
@@ -48,7 +48,7 @@ namespace Goss
 		CreateCommandPool();
 	}
 
-	Device::~Device()
+	VulkanDevice::~VulkanDevice()
 	{
 		vkDestroyCommandPool(vkDevice, commandPool, nullptr);
 		vkDestroyDevice(vkDevice, nullptr);
@@ -62,7 +62,7 @@ namespace Goss
 		vkDestroyInstance(instance, nullptr);
 	}
 
-	void Device::CreateInstance()
+	void VulkanDevice::CreateInstance()
 	{
 		if (enableValidationLayers && !CheckValidationLayerSupport())
 		{
@@ -108,7 +108,7 @@ namespace Goss
 		HasGFLWRequiredInstanceExtensions();
 	}
 
-	void Device::PickPhysicalDevice()
+	void VulkanDevice::PickPhysicalDevice()
 	{
 		uint32_t deviceCount = 0;
 		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -116,7 +116,7 @@ namespace Goss
 		{
 			throw std::runtime_error("Failed to find GPUs with Vulkan support!");
 		}
-		std::cout << "Device count: " << deviceCount << std::endl;
+		std::cout << "VulkanDevice count: " << deviceCount << std::endl;
 		std::vector<VkPhysicalDevice> devices(deviceCount);
 		vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -135,10 +135,11 @@ namespace Goss
 		}
 
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-		std::cout << "Physical device: " << properties.deviceName << std::endl;
+
+		GE_CORE_INFO("Physical device: {}",  properties.deviceName);
 	}
 
-	void Device::CreateLogicalDevice()
+	void VulkanDevice::CreateLogicalDevice()
 	{
 		QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
 
@@ -190,7 +191,7 @@ namespace Goss
 		vkGetDeviceQueue(vkDevice, indices.presentFamily, 0, &presentQueue);
 	}
 
-	void Device::CreateCommandPool()
+	void VulkanDevice::CreateCommandPool()
 	{
 		const QueueFamilyIndices queueFamilyIndices = FindPhysicalQueueFamilies();
 
@@ -205,12 +206,12 @@ namespace Goss
 		}
 	}
 
-	void Device::CreateSurface()
+	void VulkanDevice::CreateSurface()
 	{
 		window.CreateWindowSurface(instance, &vkSurfaceKHR);
 	}
 
-	bool Device::IsDeviceSuitable(VkPhysicalDevice device) const
+	bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device) const
 	{
 		QueueFamilyIndices indices = FindQueueFamilies(device);
 
@@ -229,7 +230,7 @@ namespace Goss
 		return indices.IsComplete() && extensionsSupported && swapChainAdequate &&supportedFeatures.samplerAnisotropy;
 	}
 
-	void Device::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+	void VulkanDevice::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
 	{
 		createInfo = {};
 		createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
@@ -245,7 +246,7 @@ namespace Goss
 		createInfo.pUserData = nullptr; // Optional
 	}
 
-	void Device::SetupDebugMessenger()
+	void VulkanDevice::SetupDebugMessenger()
 	{
 		if (!enableValidationLayers) return;
 
@@ -257,7 +258,7 @@ namespace Goss
 		}
 	}
 
-	bool Device::CheckValidationLayerSupport() const
+	bool VulkanDevice::CheckValidationLayerSupport() const
 	{
 		uint32_t layerCount;
 		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -287,7 +288,7 @@ namespace Goss
 		return true;
 	}
 
-	std::vector<const char*> Device::GetRequiredExtensions() const
+	std::vector<const char*> VulkanDevice::GetRequiredExtensions() const
 	{
 		uint32_t glfwExtensionCount = 0;
 		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -302,26 +303,26 @@ namespace Goss
 		return extensions;
 	}
 
-	void Device::HasGFLWRequiredInstanceExtensions() const
+	void VulkanDevice::HasGFLWRequiredInstanceExtensions() const
 	{
 		uint32_t extensionCount = 0;
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 		std::vector<VkExtensionProperties> extensions(extensionCount);
 		vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-		std::cout << "Available extensions:" << std::endl;
+		GE_CORE_INFO("Available extensions:");
 		std::unordered_set<std::string> available;
 		for (const auto& extension : extensions)
 		{
-			std::cout << "\t" << extension.extensionName << std::endl;
+			GE_CORE_TRACE("\t {}", extension.extensionName);
 			available.insert(extension.extensionName);
 		}
 
-		std::cout << "Required extensions:" << std::endl;
+		GE_CORE_INFO("Required extensions:");
 		const auto requiredExtensions = GetRequiredExtensions();
 		for (const auto& required : requiredExtensions)
-		{
-			std::cout << "\t" << required << std::endl;
+		{;
+			GE_CORE_TRACE("\t {}", required);
 			if (available.find(required) == available.end())
 			{
 				throw std::runtime_error("Missing required glfw extension");
@@ -329,7 +330,7 @@ namespace Goss
 		}
 	}
 
-	bool Device::CheckDeviceExtensionSupport(const VkPhysicalDevice device) const
+	bool VulkanDevice::CheckDeviceExtensionSupport(const VkPhysicalDevice device) const
 	{
 		uint32_t extensionCount;
 		vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
@@ -347,7 +348,7 @@ namespace Goss
 		return requiredExtensions.empty();
 	}
 
-	QueueFamilyIndices Device::FindQueueFamilies(const VkPhysicalDevice device) const
+	QueueFamilyIndices VulkanDevice::FindQueueFamilies(const VkPhysicalDevice device) const
 	{
 		QueueFamilyIndices indices;
 
@@ -382,7 +383,7 @@ namespace Goss
 		return indices;
 	}
 
-	SwapChainSupportDetails Device::QuerySwapChainSupport(const VkPhysicalDevice device) const
+	SwapChainSupportDetails VulkanDevice::QuerySwapChainSupport(const VkPhysicalDevice device) const
 	{
 		SwapChainSupportDetails details;
 		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, vkSurfaceKHR, &details.capabilities);
@@ -407,7 +408,7 @@ namespace Goss
 		return details;
 	}
 
-	VkFormat Device::FindSupportedFormat(const std::vector<VkFormat>& candidates, const VkImageTiling tiling, const VkFormatFeatureFlags features) const
+	VkFormat VulkanDevice::FindSupportedFormat(const std::vector<VkFormat>& candidates, const VkImageTiling tiling, const VkFormatFeatureFlags features) const
 	{
 		for (const VkFormat format : candidates)
 		{
@@ -426,7 +427,7 @@ namespace Goss
 		throw std::runtime_error("failed to find supported format!");
 	}
 
-	uint32_t Device::FindMemoryType(const uint32_t typeFilter, const VkMemoryPropertyFlags flags) const
+	uint32_t VulkanDevice::FindMemoryType(const uint32_t typeFilter, const VkMemoryPropertyFlags flags) const
 	{
 		VkPhysicalDeviceMemoryProperties memProperties;
 		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -441,7 +442,7 @@ namespace Goss
 		throw std::runtime_error("failed to find suitable memory type!");
 	}
 
-	void Device::CreateBuffer(const VkDeviceSize size, const VkBufferUsageFlags usage, const VkMemoryPropertyFlags flags, VkBuffer& buffer, VkDeviceMemory& bufferMemory) const
+	void VulkanDevice::CreateBuffer(const VkDeviceSize size, const VkBufferUsageFlags usage, const VkMemoryPropertyFlags flags, VkBuffer& buffer, VkDeviceMemory& bufferMemory) const
 	{
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -470,7 +471,7 @@ namespace Goss
 		vkBindBufferMemory(vkDevice, buffer, bufferMemory, 0);
 	}
 
-	VkCommandBuffer Device::BeginSingleTimeCommands() const
+	VkCommandBuffer VulkanDevice::BeginSingleTimeCommands() const
 	{
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -489,7 +490,7 @@ namespace Goss
 		return commandBuffer;
 	}
 
-	void Device::EndSingleTimeCommands(const VkCommandBuffer commandBuffer) const
+	void VulkanDevice::EndSingleTimeCommands(const VkCommandBuffer commandBuffer) const
 	{
 		vkEndCommandBuffer(commandBuffer);
 
@@ -504,7 +505,7 @@ namespace Goss
 		vkFreeCommandBuffers(vkDevice, commandPool, 1, &commandBuffer);
 	}
 
-	void Device::CopyBuffer(const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize size) const
+	void VulkanDevice::CopyBuffer(const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize size) const
 	{
 		const VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
@@ -517,7 +518,7 @@ namespace Goss
 		EndSingleTimeCommands(commandBuffer);
 	}
 
-	void Device::CopyBufferToImage(const VkBuffer buffer, const VkImage image, const uint32_t width, const uint32_t height, const uint32_t layerCount) const
+	void VulkanDevice::CopyBufferToImage(const VkBuffer buffer, const VkImage image, const uint32_t width, const uint32_t height, const uint32_t layerCount) const
 	{
 		const VkCommandBuffer commandBuffer = BeginSingleTimeCommands();
 
@@ -538,7 +539,7 @@ namespace Goss
 		EndSingleTimeCommands(commandBuffer);
 	}
 
-	void Device::CreateImageWithInfo(const VkImageCreateInfo& imageInfo, const VkMemoryPropertyFlags flags, VkImage& image, VkDeviceMemory& imageMemory) const
+	void VulkanDevice::CreateImageWithInfo(const VkImageCreateInfo& imageInfo, const VkMemoryPropertyFlags flags, VkImage& image, VkDeviceMemory& imageMemory) const
 	{
 		if (vkCreateImage(vkDevice, &imageInfo, nullptr, &image) != VK_SUCCESS)
 		{

@@ -1,5 +1,5 @@
 #pragma once
-#include "Device.h"
+#include "VulkanDevice.h"
 
 namespace Goss
 {
@@ -26,14 +26,14 @@ namespace Goss
 		uint32_t subpass = 0;
 	};
 
-	class Pipeline
+	class VulkanPipeline
 	{
 	public:
-		Pipeline(Device& device, const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo);
-		~Pipeline();
+		VulkanPipeline(VulkanDevice& device, const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo);
+		~VulkanPipeline();
 
-		Pipeline(const Pipeline&) = delete;
-		Pipeline& operator=(const Pipeline&) = delete;
+		VulkanPipeline(const VulkanPipeline&) = delete;
+		VulkanPipeline& operator=(const VulkanPipeline&) = delete;
 
 		void Bind(VkCommandBuffer commandBuffer) const;
 
@@ -46,7 +46,7 @@ namespace Goss
 
 		static void EnableAlphaBlending(PipelineConfigInfo& configInfo);
 
-		Device& engineDevice;
+		VulkanDevice& engineDevice;
 		VkPipeline graphicsPipeline;
 		VkShaderModule vertShaderModule;
 		VkShaderModule fragShaderModule;

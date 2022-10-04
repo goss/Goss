@@ -1,24 +1,24 @@
 #pragma once
 
-#include "Device.h"
+#include "VulkanDevice.h"
 #include "GameObject.h"
 #include "Model.h"
-#include "Renderer.h"
-#include "Window.h"
+#include "VulkanRenderer.h"
+#include "VulkanWindow.h"
 
 namespace Goss
 {
-	class Bootstrap
+	class VulkanBootstrap
 	{
 	public:
 		static constexpr int WIDTH = 800;
 		static constexpr int HEIGHT = 600;
 
-		Bootstrap();
-		~Bootstrap();
+		VulkanBootstrap();
+		~VulkanBootstrap();
 
-		Bootstrap(const Bootstrap&) = delete;
-		Bootstrap& operator=(const Bootstrap&) = delete;
+		VulkanBootstrap(const VulkanBootstrap&) = delete;
+		VulkanBootstrap& operator=(const VulkanBootstrap&) = delete;
 
 		void Run();
 
@@ -27,9 +27,9 @@ namespace Goss
 
 		std::unique_ptr<Model> CreateCubeModel(glm::vec3 offset);
 
-		Window window{WIDTH, HEIGHT, "Goss"};
-		Device device{window};
-		Renderer renderer{window, device};
+		VulkanWindow window{WIDTH, HEIGHT, "Goss"};
+		VulkanDevice device{window};
+		VulkanRenderer renderer{window, device};
 
 		std::vector<GameObject> gameObjects;
 

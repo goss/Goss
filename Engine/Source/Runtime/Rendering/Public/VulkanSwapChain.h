@@ -1,20 +1,20 @@
 #pragma once
 
-#include "Device.h"
+#include "VulkanDevice.h"
 
 namespace Goss
 {
-	class SwapChain
+	class VulkanSwapChain
 	{
 	public:
 		static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-		SwapChain(Device& deviceRef, VkExtent2D extent);
-		SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous);
-		~SwapChain();
+		VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D extent);
+		VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D extent, std::shared_ptr<VulkanSwapChain> previous);
+		~VulkanSwapChain();
 
-		SwapChain(const SwapChain&) = delete;
-		SwapChain& operator=(const SwapChain&) = delete;
+		VulkanSwapChain(const VulkanSwapChain&) = delete;
+		VulkanSwapChain& operator=(const VulkanSwapChain&) = delete;
 
 		VkFramebuffer GetFrameBuffer(const uint32_t index) const { return swapChainFrameBuffers[index]; }
 		VkRenderPass GetRenderPass() const { return renderPass; }
@@ -35,7 +35,7 @@ namespace Goss
 		VkResult AcquireNextImage(uint32_t* imageIndex) const;
 		VkResult SubmitCommandBuffers(const VkCommandBuffer* buffers, const uint32_t* imageIndex);
 
-		bool CompareSwapFormats(const SwapChain &inSwapChain) const
+		bool CompareSwapFormats(const VulkanSwapChain &inSwapChain) const
 		{
 			return inSwapChain.swapChainDepthFormat == swapChainDepthFormat &&
 			       inSwapChain.swapChainImageFormat == swapChainImageFormat;
@@ -68,12 +68,12 @@ namespace Goss
 		std::vector<VkImage> swapChainImages;
 		std::vector<VkImageView> swapChainImageViews;
 
-		Device& device;
+		VulkanDevice& device;
 		VkExtent2D windowExtent;
 
 		VkSwapchainKHR swapChain{};
 
-		std::shared_ptr<SwapChain> oldSwapChain;
+		std::shared_ptr<VulkanSwapChain> oldSwapChain;
 
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;

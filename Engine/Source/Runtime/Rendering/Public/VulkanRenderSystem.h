@@ -2,18 +2,18 @@
 
 #include "Camera.h"
 #include "GameObject.h"
-#include "Pipeline.h"
+#include "VulkanPipeline.h"
 
 namespace Goss
 {
-	class RenderSystem
+	class VulkanRenderSystem
 	{
 		public:
-		RenderSystem(Device &device, VkRenderPass renderPass);
-		~RenderSystem();
+		VulkanRenderSystem(VulkanDevice &device, VkRenderPass renderPass);
+		~VulkanRenderSystem();
 
-		RenderSystem(const RenderSystem &) = delete;
-		RenderSystem &operator=(const RenderSystem &) = delete;
+		VulkanRenderSystem(const VulkanRenderSystem &) = delete;
+		VulkanRenderSystem &operator=(const VulkanRenderSystem &) = delete;
 
 		void Tick(float deltaTime, std::vector<GameObject>& gameObjects) const;
 		void Render(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects, const Camera& camera) const;
@@ -22,9 +22,9 @@ namespace Goss
 		void CreatePipelineLayout();
 		void CreatePipeline(VkRenderPass renderPass);
 
-		Device &lveDevice;
+		VulkanDevice &lveDevice;
 
-		std::unique_ptr<Pipeline> lvePipeline;
+		std::unique_ptr<VulkanPipeline> lvePipeline;
 		VkPipelineLayout pipelineLayout;
 	};
 } 

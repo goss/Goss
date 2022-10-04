@@ -1,15 +1,15 @@
 #include "gepch.h"
 
-#include "SwapChain.h"
+#include "VulkanSwapChain.h"
 
 namespace Goss
 {
-	SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent) : device{deviceRef}, windowExtent{extent}
+	VulkanSwapChain::VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D extent) : device{deviceRef}, windowExtent{extent}
 	{
 		Init();
 	}
 
-	SwapChain::SwapChain(Device& deviceRef, VkExtent2D extent, std::shared_ptr<SwapChain> previous):
+	VulkanSwapChain::VulkanSwapChain(VulkanDevice& deviceRef, VkExtent2D extent, std::shared_ptr<VulkanSwapChain> previous):
 		device(deviceRef), windowExtent{extent}, oldSwapChain(std::move(previous))
 	{
 		Init();
@@ -17,7 +17,7 @@ namespace Goss
 		oldSwapChain = nullptr;
 	}
 
-	SwapChain::~SwapChain()
+	VulkanSwapChain::~VulkanSwapChain()
 	{
 		for (const auto imageView : swapChainImageViews)
 		{
@@ -55,7 +55,7 @@ namespace Goss
 		}
 	}
 
-	VkResult SwapChain::AcquireNextImage(uint32_t* imageIndex) const
+	VkResult VulkanSwapChain::AcquireNextImage(uint32_t* imageIndex) const
 	{
 		vkWaitForFences(device.GetDevice(), 1, &inFlightFences[currentFrame],VK_TRUE, std::numeric_limits<uint64_t>::max());
 
@@ -66,7 +66,7 @@ namespace Goss
 		return result;
 	}
 
-	VkResult SwapChain::SubmitCommandBuffers(const VkCommandBuffer* buffers, const uint32_t* imageIndex)
+	VkResult VulkanSwapChain::SubmitCommandBuffers(const VkCommandBuffer* buffers, const uint32_t* imageIndex)
 	{
 		if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE)
 		{
@@ -115,7 +115,7 @@ namespace Goss
 		return result;
 	}
 
-	void SwapChain::Init()
+	void VulkanSwapChain::Init()
 	{
 		CreateSwapChain();
 		CreateImageViews();
@@ -125,7 +125,7 @@ namespace Goss
 		CreateSyncObjects();
 	}
 
-	void SwapChain::CreateSwapChain()
+	void VulkanSwapChain::CreateSwapChain()
 	{
 		const SwapChainSupportDetails swapChainSupport = device.GetSwapChainSupport();
 		const VkSurfaceFormatKHR surfaceFormat = ChooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -188,7 +188,7 @@ namespace Goss
 		swapChainExtent = extent;
 	}
 
-	void SwapChain::CreateImageViews()
+	void VulkanSwapChain::CreateImageViews()
 	{
 		swapChainImageViews.resize(swapChainImages.size());
 		for (size_t i = 0; i < swapChainImages.size(); i++)
@@ -211,7 +211,7 @@ namespace Goss
 		}
 	}
 
-	void SwapChain::CreateRenderPass()
+	void VulkanSwapChain::CreateRenderPass()
 	{
 		VkAttachmentDescription depthAttachment{};
 		depthAttachment.format = FindDepthFormat();
@@ -272,7 +272,7 @@ namespace Goss
 		}
 	}
 
-	void SwapChain::CreateFrameBuffers()
+	void VulkanSwapChain::CreateFrameBuffers()
 	{
 		swapChainFrameBuffers.resize(ImageCount());
 		for (size_t i = 0; i < ImageCount(); i++)
@@ -296,7 +296,7 @@ namespace Goss
 		}
 	}
 
-	void SwapChain::CreateDepthResources()
+	void VulkanSwapChain::CreateDepthResources()
 	{
 		const VkFormat depthFormat = FindDepthFormat();
 		swapChainDepthFormat = depthFormat;
@@ -346,7 +346,7 @@ namespace Goss
 		}
 	}
 
-	void SwapChain::CreateSyncObjects()
+	void VulkanSwapChain::CreateSyncObjects()
 	{
 		imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
 		renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -371,7 +371,7 @@ namespace Goss
 		}
 	}
 
-	VkSurfaceFormatKHR SwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+	VkSurfaceFormatKHR VulkanSwapChain::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 	{
 		for (const auto& availableFormat : availableFormats)
 		{
@@ -384,7 +384,7 @@ namespace Goss
 		return availableFormats[0];
 	}
 
-	VkPresentModeKHR SwapChain::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
+	VkPresentModeKHR VulkanSwapChain::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
 	{
 		for (const auto& availablePresentMode : availablePresentModes)
 		{
@@ -405,7 +405,7 @@ namespace Goss
 		return VK_PRESENT_MODE_FIFO_KHR;
 	}
 
-	VkExtent2D SwapChain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const
+	VkExtent2D VulkanSwapChain::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) const
 	{
 		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
 		{
@@ -419,7 +419,7 @@ namespace Goss
 		return actualExtent;
 	}
 
-	VkFormat SwapChain::FindDepthFormat() const
+	VkFormat VulkanSwapChain::FindDepthFormat() const
 	{
 		return device.FindSupportedFormat({VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
 											VK_IMAGE_TILING_OPTIMAL,

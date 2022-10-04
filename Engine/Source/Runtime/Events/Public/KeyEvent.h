@@ -1,8 +1,8 @@
 #pragma once
-#include "gepch.h"
-
 #include "Event.h"
 #include "KeyCodes.h"
+
+#include <sstream>
 
 namespace Goss {
 
@@ -22,7 +22,7 @@ namespace Goss {
 	class KeyPressedEvent final : public KeyEvent
 	{
 	public:
-		explicit KeyPressedEvent(const KeyCode keycode, bool isRepeat = false)
+		explicit KeyPressedEvent(const KeyCode keycode, const bool isRepeat = false)
 			: KeyEvent(keycode), isRepeated(isRepeat) {}
 
 		bool IsRepeat() const { return isRepeated; }

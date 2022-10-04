@@ -1,7 +1,7 @@
 #pragma once
-#include "gepch.h"
-
 #include "Event.h"
+
+#include <sstream>
 
 namespace Goss
 {

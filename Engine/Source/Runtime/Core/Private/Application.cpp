@@ -1,7 +1,7 @@
 #include "gepch.h"
 
 #include "Application.h"
-#include "Bootstrap.h"
+#include "VulkanBootstrap.h"
 #include "Log.h"
 
 namespace Goss
@@ -11,7 +11,7 @@ namespace Goss
 
 	void Application::Run()
 	{
-		Bootstrap bootstrap{};
+		VulkanBootstrap bootstrap{};
 		bootstrap.Run();
 	}
 }

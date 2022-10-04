@@ -11,6 +11,8 @@ namespace Goss
 		Application();
 		virtual ~Application();
 		void Run();
+	private:
+		friend int ::main(int argc, char** argv);
 	};
 
 	Application* CreateApplication();

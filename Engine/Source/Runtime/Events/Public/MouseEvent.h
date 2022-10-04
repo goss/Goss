@@ -1,8 +1,8 @@
 #pragma once
-#include "gepch.h"
-
 #include "Event.h"
 #include "MouseCodes.h"
+
+#include <sstream>
 
 namespace Goss {
 

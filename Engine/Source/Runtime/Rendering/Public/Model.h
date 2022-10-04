@@ -1,5 +1,5 @@
 #pragma once
-#include "Device.h"
+#include "VulkanDevice.h"
 
 // glm
 #define GLM_FORCE_RADIANS
@@ -20,7 +20,7 @@ namespace Goss
 			static std::vector<VkVertexInputAttributeDescription> GetAttributeDescriptions();
 		};
 
-		Model(Device& device, const std::vector<Vertex>& vertices);
+		Model(VulkanDevice& device, const std::vector<Vertex>& vertices);
 		~Model();
 
 		Model(const Model&) = delete;
@@ -32,7 +32,7 @@ namespace Goss
 	private:
 		void CreateVertexBuffers(const std::vector<Vertex>& vertices);
 
-		Device& device;
+		VulkanDevice& device;
 		VkBuffer vertexBuffer{};
 		VkDeviceMemory vertexBufferMemory{};
 		uint32_t vertexCount{};

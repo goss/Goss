@@ -1,5 +1,5 @@
 #pragma once
-#include "Window.h"
+#include "VulkanWindow.h"
 
 namespace Goss
 {
@@ -19,7 +19,7 @@ namespace Goss
 		bool IsComplete() const { return graphicsFamilyHasValue && presentFamilyHasValue; }
 	};
 
-	class Device
+	class VulkanDevice
 	{
 	public:
 #ifdef NDEBUG
@@ -28,12 +28,12 @@ namespace Goss
 		const bool enableValidationLayers = true;
 #endif
 
-		explicit Device(Window& window);
-		~Device();
+		explicit VulkanDevice(VulkanWindow& window);
+		~VulkanDevice();
 
 		// Not copyable or movable
-		Device(const Device&) = delete;
-		Device& operator=(const Device&) = delete;
+		VulkanDevice(const VulkanDevice&) = delete;
+		VulkanDevice& operator=(const VulkanDevice&) = delete;
 
 		VkCommandPool GetCommandPool() const { return commandPool; }
 		VkDevice GetDevice() const { return vkDevice; }
@@ -75,7 +75,7 @@ namespace Goss
 		bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const;
 		SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device) const;
 
-		Window& window;
+		VulkanWindow& window;
 
 		VkInstance instance{};
 		VkDebugUtilsMessengerEXT debugMessenger{};

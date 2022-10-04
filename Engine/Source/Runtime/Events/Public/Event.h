@@ -1,8 +1,7 @@
 #pragma once
+#include "Core.h"
 
 #include <functional>
-
-#define BIT(x) (1 << (x))
 
 namespace Goss
 {
@@ -63,8 +62,7 @@ namespace Goss
 			: event(event)
 		{
 		}
-		
-		// F will be deduced by the compiler
+
 		template<typename T, typename F>
 		bool Dispatch(const F& func)
 		{

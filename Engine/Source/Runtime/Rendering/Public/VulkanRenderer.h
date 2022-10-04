@@ -1,19 +1,19 @@
 #pragma once
-#include "Window.h"
-#include "SwapChain.h"
+#include "VulkanWindow.h"
+#include "VulkanSwapChain.h"
 
 #include <vulkan/vulkan_core.h>
 
 namespace Goss
 {
-	class Renderer
+	class VulkanRenderer
 	{
 	public:
-		Renderer(Window& window, Device& device);
-		~Renderer();
+		VulkanRenderer(VulkanWindow& window, VulkanDevice& device);
+		~VulkanRenderer();
 
-		Renderer(const Renderer&) = delete;
-		Renderer& operator=(const Renderer&) = delete;
+		VulkanRenderer(const VulkanRenderer&) = delete;
+		VulkanRenderer& operator=(const VulkanRenderer&) = delete;
 
 		VkRenderPass GetSwapChainRenderPass() const { return swapChain->GetRenderPass(); }
 		bool IsFrameInProgress() const { return isFrameStarted; }
@@ -40,9 +40,9 @@ namespace Goss
 		void FreeCommandBuffers();
 		void RecreateSwapChain();
 
-		Window& window;
-		Device& device;
-		std::unique_ptr<SwapChain> swapChain;
+		VulkanWindow& window;
+		VulkanDevice& device;
+		std::unique_ptr<VulkanSwapChain> swapChain;
 		std::vector<VkCommandBuffer> commandBuffers;
 
 		uint32_t currentImageIndex = 0;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Platform.h"
+
 #ifdef GE_PLATFORM_WINDOWS
 	#ifndef NOMINMAX
 /**

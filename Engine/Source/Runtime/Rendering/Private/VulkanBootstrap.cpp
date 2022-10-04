@@ -1,31 +1,26 @@
 #include "gepch.h"
 
-#include "Bootstrap.h"
+#include "VulkanBootstrap.h"
 
 #include "Camera.h"
 #include "GameObject.h"
-#include "RenderSystem.h"
-
-// glm
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm.hpp>
+#include "VulkanRenderSystem.h"
 
 namespace Goss
 {
-	Bootstrap::Bootstrap()
+	VulkanBootstrap::VulkanBootstrap()
 	{
 		LoadGameObjects();
 	}
 
-	Bootstrap::~Bootstrap() = default;
+	VulkanBootstrap::~VulkanBootstrap() = default;
 
-	void Bootstrap::Run()
+	void VulkanBootstrap::Run()
 	{
 		Camera camera{};
 		camera.SetViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
 
-		const RenderSystem renderSystem{device, renderer.GetSwapChainRenderPass()};
+		const VulkanRenderSystem renderSystem{device, renderer.GetSwapChainRenderPass()};
 
 		currentTime = std::chrono::high_resolution_clock::now();
 		while (!window.ShouldClose())
@@ -61,7 +56,7 @@ namespace Goss
 		vkDeviceWaitIdle(device.GetDevice());
 	}
 
-	void Bootstrap::LoadGameObjects()
+	void VulkanBootstrap::LoadGameObjects()
 	{
 		const std::shared_ptr model = CreateCubeModel({0.0f, 0.0f, 0.0f});
 		GameObject cube = GameObject::CreateGameObject();
@@ -73,7 +68,7 @@ namespace Goss
 		gameObjects.push_back(std::move(cube));
 	}
 
-	std::unique_ptr<Model> Bootstrap::CreateCubeModel(const glm::vec3 offset)
+	std::unique_ptr<Model> VulkanBootstrap::CreateCubeModel(const glm::vec3 offset)
 	{
 		std::vector<Model::Vertex> vertices
 		{

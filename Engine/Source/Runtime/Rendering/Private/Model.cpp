@@ -4,7 +4,7 @@
 
 namespace Goss
 {
-	Model::Model(Device& device, const std::vector<Vertex>& vertices) : device{device}
+	Model::Model(VulkanDevice& device, const std::vector<Vertex>& vertices) : device{device}
 	{
 		CreateVertexBuffers(vertices);
 	}

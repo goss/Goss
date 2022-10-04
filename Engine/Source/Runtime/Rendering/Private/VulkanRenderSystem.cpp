@@ -1,7 +1,7 @@
 #include "gepch.h"
 
-#include "RenderSystem.h"
-#include "Pipeline.h"
+#include "VulkanRenderSystem.h"
+#include "VulkanPipeline.h"
 
 // glm
 #include <glm.hpp>
@@ -19,18 +19,18 @@ namespace Goss
 		alignas(16) glm::vec3 color{};
 	};
 
-	RenderSystem::RenderSystem(Device& device, const VkRenderPass renderPass) : lveDevice{device}
+	VulkanRenderSystem::VulkanRenderSystem(VulkanDevice& device, const VkRenderPass renderPass) : lveDevice{device}
 	{
 		CreatePipelineLayout();
 		CreatePipeline(renderPass);
 	}
 
-	RenderSystem::~RenderSystem()
+	VulkanRenderSystem::~VulkanRenderSystem()
 	{
 		vkDestroyPipelineLayout(lveDevice.GetDevice(), pipelineLayout, nullptr);
 	}
 
-	void RenderSystem::CreatePipelineLayout()
+	void VulkanRenderSystem::CreatePipelineLayout()
 	{
 		VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -50,22 +50,22 @@ namespace Goss
 		}
 	}
 
-	void RenderSystem::CreatePipeline(const VkRenderPass renderPass)
+	void VulkanRenderSystem::CreatePipeline(const VkRenderPass renderPass)
 	{
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
 
 		PipelineConfigInfo pipelineConfig{};
-		Pipeline::DefaultPipelineConfigInfo(pipelineConfig);
+		VulkanPipeline::DefaultPipelineConfigInfo(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		lvePipeline = std::make_unique<Pipeline>(
+		lvePipeline = std::make_unique<VulkanPipeline>(
 			lveDevice,
 			"../engine/shaders/simple_shader.vert.spv",
 			"../engine/shaders/simple_shader.frag.spv",
 			pipelineConfig);
 	}
 
-	void RenderSystem::Tick(const float deltaTime, std::vector<GameObject>& gameObjects) const
+	void VulkanRenderSystem::Tick(const float deltaTime, std::vector<GameObject>& gameObjects) const
 	{
 		for (GameObject& gameObject : gameObjects)
 		{
@@ -74,7 +74,7 @@ namespace Goss
 		}
 	}
 
-	void RenderSystem::Render(const VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) const
+	void VulkanRenderSystem::Render(const VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) const
 	{
 		lvePipeline->Bind(commandBuffer);
 

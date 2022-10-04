@@ -1,18 +1,18 @@
 #include "gepch.h"
 
-#include "Renderer.h"
+#include "VulkanRenderer.h"
 
 namespace Goss
 {
-	Renderer::Renderer(Window& window, Device& device) : window{window}, device{device}
+	VulkanRenderer::VulkanRenderer(VulkanWindow& window, VulkanDevice& device) : window{window}, device{device}
 	{
 		RecreateSwapChain();
 		CreateCommandBuffers();
 	}
 
-	Renderer::~Renderer() { FreeCommandBuffers(); }
+	VulkanRenderer::~VulkanRenderer() { FreeCommandBuffers(); }
 
-	void Renderer::RecreateSwapChain()
+	void VulkanRenderer::RecreateSwapChain()
 	{
 		VkExtent2D extent = window.GetExtent();
 		while (extent.width == 0 || extent.height == 0)
@@ -24,12 +24,12 @@ namespace Goss
 
 		if (swapChain == nullptr)
 		{
-			swapChain = std::make_unique<SwapChain>(device, extent);
+			swapChain = std::make_unique<VulkanSwapChain>(device, extent);
 		}
 		else
 		{
 			std::shared_ptr oldSwapChain = std::move(swapChain);
-			swapChain = std::make_unique<SwapChain>(device, extent, oldSwapChain);
+			swapChain = std::make_unique<VulkanSwapChain>(device, extent, oldSwapChain);
 
 			if (!oldSwapChain->CompareSwapFormats(*swapChain))
 			{
@@ -38,9 +38,9 @@ namespace Goss
 		}
 	}
 
-	void Renderer::CreateCommandBuffers()
+	void VulkanRenderer::CreateCommandBuffers()
 	{
-		commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+		commandBuffers.resize(VulkanSwapChain::MAX_FRAMES_IN_FLIGHT);
 
 		VkCommandBufferAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -55,7 +55,7 @@ namespace Goss
 		}
 	}
 
-	void Renderer::FreeCommandBuffers()
+	void VulkanRenderer::FreeCommandBuffers()
 	{
 		vkFreeCommandBuffers(
 			device.GetDevice(),
@@ -65,7 +65,7 @@ namespace Goss
 		commandBuffers.clear();
 	}
 
-	VkCommandBuffer Renderer::BeginFrame()
+	VkCommandBuffer VulkanRenderer::BeginFrame()
 	{
 		const VkResult result = swapChain->AcquireNextImage(&currentImageIndex);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR)
@@ -92,7 +92,7 @@ namespace Goss
 		return commandBuffer;
 	}
 
-	void Renderer::EndFrame()
+	void VulkanRenderer::EndFrame()
 	{
 		const VkCommandBuffer commandBuffer = GetCurrentCommandBuffer();
 		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS)
@@ -112,10 +112,10 @@ namespace Goss
 		}
 
 		isFrameStarted = false;
-		currentFrameIndex = (currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
+		currentFrameIndex = (currentFrameIndex + 1) % VulkanSwapChain::MAX_FRAMES_IN_FLIGHT;
 	}
 
-	void Renderer::BeginSwapChainRenderPass(const VkCommandBuffer commandBuffer) const
+	void VulkanRenderer::BeginSwapChainRenderPass(const VkCommandBuffer commandBuffer) const
 	{
 		VkRenderPassBeginInfo renderPassInfo{};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -146,7 +146,7 @@ namespace Goss
 		vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 	}
 
-	void Renderer::EndSwapChainRenderPass(const VkCommandBuffer commandBuffer) const
+	void VulkanRenderer::EndSwapChainRenderPass(const VkCommandBuffer commandBuffer) const
 	{
 		vkCmdEndRenderPass(commandBuffer);
 	}

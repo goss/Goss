@@ -8,7 +8,7 @@
 
 namespace Goss
 {
-	class Window
+	class VulkanWindow
 	{
 	    GLFWwindow* window = nullptr;
 
@@ -17,11 +17,11 @@ namespace Goss
 		bool framebufferResized = false;
 
 	public:
-	    Window(int width, int height, const char* name);
-	    ~Window();
+	    VulkanWindow(int width, int height, const char* name);
+	    ~VulkanWindow();
 
-	    Window(const Window &) = delete;
-	    Window &operator=(const Window &) = delete;
+	    VulkanWindow(const VulkanWindow &) = delete;
+	    VulkanWindow &operator=(const VulkanWindow &) = delete;
 
 		bool ShouldClose() const { return glfwWindowShouldClose(window);}
 		VkExtent2D GetExtent() const { return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }

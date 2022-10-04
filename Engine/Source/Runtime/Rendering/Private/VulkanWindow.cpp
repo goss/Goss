@@ -1,12 +1,15 @@
 #include "gepch.h"
 
-#include "Window.h"
+#include "VulkanWindow.h"
+
+#include "Core.h"
 
 namespace Goss
 {
-	Window::Window(const int width, const int height, const char* name): width(width), height(height)
+	VulkanWindow::VulkanWindow(const int width, const int height, const char* name): width(width), height(height)
 	{
-		glfwInit();
+		const int results = glfwInit();
+		GE_CORE_ASSERT(1, "Could not intialize GLFW")
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -16,16 +19,16 @@ namespace Goss
 		glfwSetWindowUserPointer(window, this);
 		glfwSetFramebufferSizeCallback(window, FramebufferResizedCallback);
 
-		std::cout << "GLFW Version: " << glfwGetVersionString() << std::endl;
+		GE_CORE_INFO("GLFW Version: {}", glfwGetVersionString());
 	}
 
-	Window::~Window()
+	VulkanWindow::~VulkanWindow()
 	{
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
 
-	void Window::CreateWindowSurface(const VkInstance instance, VkSurfaceKHR* surface) const
+	void VulkanWindow::CreateWindowSurface(const VkInstance instance, VkSurfaceKHR* surface) const
 	{
 		if (glfwCreateWindowSurface(instance, window, nullptr, surface))
 		{
@@ -33,9 +36,9 @@ namespace Goss
 		}
 	}
 
-	void Window::FramebufferResizedCallback(GLFWwindow* window, const int width, const int height)
+	void VulkanWindow::FramebufferResizedCallback(GLFWwindow* window, const int width, const int height)
 	{
-		Window* appWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+		VulkanWindow* appWindow = static_cast<VulkanWindow*>(glfwGetWindowUserPointer(window));
 		appWindow->framebufferResized = true;
 		appWindow->width = width;
 		appWindow->height = height;

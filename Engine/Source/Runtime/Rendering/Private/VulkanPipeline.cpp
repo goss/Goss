@@ -1,6 +1,6 @@
 #include "gepch.h"
 
-#include "Pipeline.h"
+#include "VulkanPipeline.h"
 
 #include <fstream>
 
@@ -9,14 +9,14 @@
 
 namespace Goss
 {
-	Pipeline::Pipeline(Device& device, const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo):
+	VulkanPipeline::VulkanPipeline(VulkanDevice& device, const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo):
 		engineDevice(device), graphicsPipeline(nullptr), vertShaderModule(nullptr), fragShaderModule(nullptr)
 	{
 		CreateGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
 	}
 
 
-	Pipeline::~Pipeline()
+	VulkanPipeline::~VulkanPipeline()
 	{
 		const VkDevice device = engineDevice.GetDevice();
 		vkDestroyShaderModule(device, vertShaderModule, nullptr);
@@ -27,7 +27,7 @@ namespace Goss
 		fragShaderModule = VK_NULL_HANDLE;
 	}
 
-	std::vector<char> Pipeline::ReadFile(const char* filepath)
+	std::vector<char> VulkanPipeline::ReadFile(const char* filepath)
 	{
 		std::ifstream file = std::ifstream(filepath, std::ios::ate | std::ios::binary);
 		std::cout << filepath << std::endl;
@@ -46,12 +46,12 @@ namespace Goss
 		throw std::runtime_error(std::string("Failed to open file: ").append(filepath));
 	}
 
-	void Pipeline::Bind(const VkCommandBuffer commandBuffer) const
+	void VulkanPipeline::Bind(const VkCommandBuffer commandBuffer) const
 	{
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}
 
-	void Pipeline::DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
+	void VulkanPipeline::DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	{
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -123,7 +123,7 @@ namespace Goss
 		configInfo.attributeDescriptions = Model::Vertex::GetAttributeDescriptions();
 	}
 
-	void Pipeline::CreateGraphicsPipeline(const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo)
+	void VulkanPipeline::CreateGraphicsPipeline(const char* vertFilepath, const char* fragFilepath, const PipelineConfigInfo& configInfo)
 	{
 		assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
 		assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no renderPass provided in configInfo");
@@ -187,7 +187,7 @@ namespace Goss
 		}
 	}
 
-	void Pipeline::CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) const
+	void VulkanPipeline::CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) const
 	{
 		VkShaderModuleCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -200,7 +200,7 @@ namespace Goss
 		}
 	}
 
-	void Pipeline::EnableAlphaBlending(PipelineConfigInfo& configInfo)
+	void VulkanPipeline::EnableAlphaBlending(PipelineConfigInfo& configInfo)
 	{
 		configInfo.colorBlendAttachment.blendEnable = VK_TRUE;
 		configInfo.colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
