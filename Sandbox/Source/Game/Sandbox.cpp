@@ -11,9 +11,7 @@ namespace Goss
 
 	Application* CreateApplication()
 	{
+		GE_CORE_INFO("Creating Sandbox Application");
 		return new Sandbox();
 	}
 }
-
-
-

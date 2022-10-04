@@ -13,7 +13,8 @@ workspace "Goss"
 	
 IncludeDir = {}
 IncludeDir["EngineSource"] = "%{wks.location}/Engine/Source/"
-IncludeDir["EngineRuntime"] = "%{wks.location}/Engine/Source/Runtime/Public"
+IncludeDir["EngineRendering"] = "%{wks.location}/Engine/Source/Runtime/Rendering/Public"
+IncludeDir["EngineLogging"] = "%{wks.location}/Engine/Source/Runtime/Core/Logging/Public"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 IncludeDir["GLFW"] = "%{wks.location}/Engine/ThirdParty/glfw/include"
 IncludeDir["GLM"] = "%{wks.location}/Engine/ThirdParty/glm/glm"
@@ -23,14 +24,16 @@ Library = {}
 Library["Vulkan"] = "%{VULKAN_SDK}/Lib/vulkan-1.lib"
 Library["VulkanUtils"] = "%{VULKAN_SDK}/VkLayer_utils.lib"
 
-include "Engine/ThirdParty/glfw/" --include GLFW premade5.lua
+--include GLFW premade5.lua 
+--new projects should copy the glfw.lua script to Engine/ThirdParty/glfw/ folder
+--rename file to premake5.lua
+include "Engine/ThirdParty/glfw/" 
 
 project "Engine"
 	location "Engine"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "off"
 
 	targetdir ("%{wks.location}/Bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/Intermediates/" .. outputdir .. "/%{prj.name}")
@@ -47,7 +50,9 @@ project "Engine"
 	includedirs
 	{
 		"%{IncludeDir.EngineSource}",
-		"%{IncludeDir.EngineRuntime}",
+		"%{IncludeDir.EngineLogging}",
+		"%{IncludeDir.EngineRendering}",
+
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLM}",
@@ -81,6 +86,7 @@ project "Engine"
 		defines "GE_DEBUG"
 		runtime "Debug"
 		symbols "On"
+		staticruntime "off"
 
 	filter "configurations:Release"
 		defines "GE_RELEASE"
@@ -107,6 +113,7 @@ project "Sandbox"
 	includedirs
 	{
 		"%{IncludeDir.EngineSource}",
+		"%{IncludeDir.EngineLogging}",
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLM}",

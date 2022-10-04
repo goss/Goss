@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Bootstrap.h"
+#include "Log.h"
 
 namespace Goss
 {
@@ -22,6 +23,9 @@ Goss::Application* CreateApplication()
 
 int main(int argc, char** argv)
 {
+	Goss::Log::Init();
+	GE_CORE_INFO("Creating Application");
+
 	const auto application = Goss::CreateApplication();
 	application->Run();
 	delete application;
