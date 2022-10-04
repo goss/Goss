@@ -367,5 +367,5 @@ FodyWeavers.xsd
 *.vcxproj
 *.filters
 *.sln
-Engine/ThirdParty/glfw
-Engine/ThirdParty/glfw
+
+Engine/ThirdParty/
