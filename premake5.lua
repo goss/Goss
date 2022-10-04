@@ -13,8 +13,10 @@ workspace "Goss"
 	
 IncludeDir = {}
 IncludeDir["EngineSource"] = "%{wks.location}/Engine/Source/"
+IncludeDir["EngineCore"] = "%{wks.location}/Engine/Source/Runtime/Core/Public"
+IncludeDir["EngineEvents"] = "%{wks.location}/Engine/Source/Runtime/Events/Public"
 IncludeDir["EngineRendering"] = "%{wks.location}/Engine/Source/Runtime/Rendering/Public"
-IncludeDir["EngineLogging"] = "%{wks.location}/Engine/Source/Runtime/Core/Logging/Public"
+
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 IncludeDir["GLFW"] = "%{wks.location}/Engine/ThirdParty/glfw/include"
 IncludeDir["GLM"] = "%{wks.location}/Engine/ThirdParty/glm/glm"
@@ -50,7 +52,8 @@ project "Engine"
 	includedirs
 	{
 		"%{IncludeDir.EngineSource}",
-		"%{IncludeDir.EngineLogging}",
+		"%{IncludeDir.EngineCore}",
+		"%{IncludeDir.EngineEvents}",
 		"%{IncludeDir.EngineRendering}",
 
 		"%{IncludeDir.VulkanSDK}",
@@ -84,9 +87,9 @@ project "Engine"
 	
 	filter "configurations:Debug"
 		defines "GE_DEBUG"
-		runtime "Debug"
 		symbols "On"
 		staticruntime "off"
+		runtime "Debug"
 
 	filter "configurations:Release"
 		defines "GE_RELEASE"
@@ -113,7 +116,8 @@ project "Sandbox"
 	includedirs
 	{
 		"%{IncludeDir.EngineSource}",
-		"%{IncludeDir.EngineLogging}",
+		"%{IncludeDir.EngineCore}",
+		
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLM}",
