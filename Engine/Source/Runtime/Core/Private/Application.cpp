@@ -1,18 +1,30 @@
 #include "gepch.h"
 
 #include "Application.h"
-#include "VulkanBootstrap.h"
-#include "Log.h"
 
 namespace Goss
 {
-	Application::Application() = default;
+	Application::Application()
+	{
+		instance = this;
+
+		window = Window::Create(WindowProperties("Goss"));
+		window->SetEventCallback(GE_BIND_EVENT_FN(Application::OnEvent));
+	}
+
 	Application::~Application() = default;
+
+	void Application::OnEvent(const Event& e)
+	{
+		GE_CORE_INFO(e.ToString());
+	}
 
 	void Application::Run()
 	{
-		VulkanBootstrap bootstrap{};
-		bootstrap.Run();
+		while (true)
+		{
+			window->OnUpdate();
+		}
 	}
 }
 

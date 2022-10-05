@@ -2,8 +2,6 @@
 #include "Event.h"
 #include "KeyCodes.h"
 
-#include <sstream>
-
 namespace Goss {
 
 	class KeyEvent : public Event
@@ -12,6 +10,7 @@ namespace Goss {
 		KeyCode GetKeyCode() const { return keyCode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
+
 	protected:
 		explicit KeyEvent(const KeyCode keycode)
 			: keyCode(keycode) {}

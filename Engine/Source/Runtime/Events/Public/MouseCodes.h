@@ -1,9 +1,8 @@
 #pragma once
-#include <cstdint>
 
 namespace Goss
 {
-	using MouseCode = uint16_t;
+	using MouseCode = unsigned int;
 
 	namespace Mouse
 	{

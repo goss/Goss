@@ -1,7 +1,6 @@
 #pragma once
 #include "Core.h"
-
-#include <functional>
+#include <string>
 
 namespace Goss
 {
@@ -55,6 +54,7 @@ namespace Goss
 		}
 	};
 
+
 	class EventDispatcher
 	{
 	public:
@@ -76,11 +76,6 @@ namespace Goss
 	private:
 		Event& event;
 	};
-
-	inline std::ostream& operator<<(std::ostream& os, const Event& e)
-	{
-		return os << e.ToString();
-	}
 
 }
 

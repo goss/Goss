@@ -2,8 +2,6 @@
 #include "Event.h"
 #include "MouseCodes.h"
 
-#include <sstream>
-
 namespace Goss {
 
 	class MouseMovedEvent final : public Event
@@ -68,7 +66,7 @@ namespace Goss {
 	public:
 		explicit MouseButtonPressedEvent(const MouseCode mouseCode)
 			: MouseButtonEvent(mouseCode) {}
-
+		
 		std::string ToString() const override
 		{
 			std::stringstream ss;

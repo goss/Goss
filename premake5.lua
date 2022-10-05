@@ -11,16 +11,23 @@ workspace "Goss"
 		"Release"
 	}
 	
+	flags
+	{
+		"MultiProcessorCompile"
+	}
+	
 IncludeDir = {}
-IncludeDir["EngineSource"] = "%{wks.location}/Engine/Source/"
-IncludeDir["EngineCore"] = "%{wks.location}/Engine/Source/Runtime/Core/Public"
-IncludeDir["EngineEvents"] = "%{wks.location}/Engine/Source/Runtime/Events/Public"
-IncludeDir["EngineRendering"] = "%{wks.location}/Engine/Source/Runtime/Rendering/Public"
+IncludeDir["EngineSource"] = 			"%{wks.location}/Engine/Source/"
+IncludeDir["EngineCore"] = 				"%{wks.location}/Engine/Source/Runtime/Core/Public"
+IncludeDir["EngineEvents"] = 			"%{wks.location}/Engine/Source/Runtime/Events/Public"
+IncludeDir["EngineGameframework"] = 	"%{wks.location}/Engine/Source/Runtime/GameFramework/Public"
+IncludeDir["EnginePlatformWindows"] = 	"%{wks.location}/Engine/Source/Runtime/Platform/Windows/Public"
+IncludeDir["EngineVulkan"] = 			"%{wks.location}/Engine/Source/Runtime/RenderAPI/Vulkan/Public"
 
-IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
-IncludeDir["GLFW"] = "%{wks.location}/Engine/ThirdParty/glfw/include"
-IncludeDir["GLM"] = "%{wks.location}/Engine/ThirdParty/glm/glm"
-IncludeDir["SPDLOG"] = "%{wks.location}/Engine/ThirdParty/spdlog/include"
+IncludeDir["VulkanSDK"] = 				"%{VULKAN_SDK}/Include"
+IncludeDir["GLFW"] = 					"%{wks.location}/Engine/ThirdParty/glfw/include"
+IncludeDir["GLM"] = 					"%{wks.location}/Engine/ThirdParty/glm/glm"
+IncludeDir["SPDLOG"] = 					"%{wks.location}/Engine/ThirdParty/spdlog/include"
 
 Library = {}
 Library["Vulkan"] = "%{VULKAN_SDK}/Lib/vulkan-1.lib"
@@ -54,7 +61,9 @@ project "Engine"
 		"%{IncludeDir.EngineSource}",
 		"%{IncludeDir.EngineCore}",
 		"%{IncludeDir.EngineEvents}",
-		"%{IncludeDir.EngineRendering}",
+		"%{IncludeDir.EngineGameframework}",
+		"%{IncludeDir.EnginePlatformWindows}",
+		"%{IncludeDir.EngineVulkan}",
 
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
@@ -71,7 +80,7 @@ project "Engine"
 	defines
 	{
 		--"GE_PLATFORM_WINDOWS",
-		"GE_BUILD_DLL",
+		--"GE_BUILD_DLL",
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE"
 	}
@@ -90,8 +99,8 @@ project "Engine"
 	filter "configurations:Debug"
 		defines "GE_DEBUG"
 		symbols "On"
-		staticruntime "off"
 		runtime "Debug"
+		staticruntime "off"
 
 	filter "configurations:Release"
 		defines "GE_RELEASE"
@@ -119,7 +128,9 @@ project "Sandbox"
 	{
 		"%{IncludeDir.EngineSource}",
 		"%{IncludeDir.EngineCore}",
-		
+		"%{IncludeDir.EngineEvents}",
+		"%{IncludeDir.EngineGameframework}",
+
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLM}",

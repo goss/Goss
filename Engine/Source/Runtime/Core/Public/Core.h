@@ -1,6 +1,5 @@
 #pragma once
 #include "Platform.h"
-#include "Log.h"
 
 #include <memory>
 
@@ -10,7 +9,6 @@
 	#else
 	#define GOSS_API __declspec(dllimport)
 	#endif
-
 #else
 	#error GOSS only supports Windows!
 #endif

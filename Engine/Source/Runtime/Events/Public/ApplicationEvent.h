@@ -1,8 +1,6 @@
 #pragma once
 #include "Event.h"
 
-#include <sstream>
-
 namespace Goss
 {
 	class WindowResizeEvent final : public Event
