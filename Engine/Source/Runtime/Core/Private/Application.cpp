@@ -4,6 +4,8 @@
 
 namespace Goss
 {
+	Application* Application::instance = nullptr;
+
 	Application::Application()
 	{
 		instance = this;
