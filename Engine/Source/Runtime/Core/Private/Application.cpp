@@ -2,6 +2,8 @@
 
 #include "Application.h"
 
+#include "ApplicationEvent.h"
+
 namespace Goss
 {
 	Application* Application::instance = nullptr;
@@ -16,14 +18,39 @@ namespace Goss
 
 	Application::~Application() = default;
 
-	void Application::OnEvent(const Event& e)
+	void Application::OnEvent(Event& e)
 	{
 		GE_CORE_INFO(e.ToString());
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowCloseEvent>(GE_BIND_EVENT_FN(Application::OnWindowClose));
+		dispatcher.Dispatch<WindowResizeEvent>(GE_BIND_EVENT_FN(Application::OnWindowResize));
+	}
+
+	bool Application::OnWindowClose(WindowCloseEvent& e)
+	{
+		isRunning = false;
+		return true;
+	}
+
+	bool Application::OnWindowResize(WindowResizeEvent& e)
+	{
+		if (e.GetWidth() == 0 || e.GetHeight() == 0)
+		{
+			isMinimized = true;
+			return false;
+		}
+
+		isMinimized = false;
+
+		//TODO Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+
+		return false;
 	}
 
 	void Application::Run()
 	{
-		while (true)
+		while (isRunning)
 		{
 			window->OnUpdate();
 		}

@@ -1,4 +1,5 @@
 #pragma once
+#include "ApplicationEvent.h"
 #include "Core.h"
 #include "Event.h"
 #include "Window.h"
@@ -13,17 +14,24 @@ namespace Goss
 		Application();
 		virtual ~Application();
 
+
 		void Run();
 
 		static Application& Get() { return *instance; }
 		Window& GetWindow() const { return *window; }
 		
 	private:
-		static Application* instance;
-		Scope<Window> window;
-		friend int ::main(int argc, char** argv);
+		void OnEvent(Event& e);
+		bool OnWindowResize(WindowResizeEvent& e);
+		bool OnWindowClose(WindowCloseEvent& e);
 
-		void OnEvent(const Event& e);
+		Scope<Window> window;
+
+		bool isRunning = true;
+		bool isMinimized = false;
+
+		static Application* instance;
+		friend int ::main(int argc, char** argv);
 	};
 
 	Application* CreateApplication();
