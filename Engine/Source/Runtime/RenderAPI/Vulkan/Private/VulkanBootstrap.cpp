@@ -4,6 +4,7 @@
 
 #include "Camera.h"
 #include "GameObject.h"
+#include "OrthographicCamera.h"
 #include "VulkanRenderSystem.h"
 
 namespace Goss
@@ -17,10 +18,13 @@ namespace Goss
 
 	void VulkanBootstrap::Run()
 	{
-		Camera camera{};
-		camera.SetViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
-
 		const VulkanRenderSystem renderSystem{device, renderer.GetSwapChainRenderPass()};
+			const float aspect = renderer.GetAspectRatio();
+
+		OrthographicCamera camera(-1, 1, 1, -1);
+		//camera.SetViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
+		//camera.SetOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+		//camera.SetPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 100.f);
 
 		currentTime = std::chrono::high_resolution_clock::now();
 		while (!window.ShouldClose())
@@ -39,10 +43,6 @@ namespace Goss
 			}
 
 			renderSystem.Tick(frameTime , gameObjects);
-	
-			const float aspect = renderer.GetAspectRatio();
-			//camera.SetOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
-			camera.SetPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 100.f);
 
 			if (const VkCommandBuffer commandBuffer = renderer.BeginFrame()) 
 			{

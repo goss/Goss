@@ -22,6 +22,7 @@ IncludeDir["EngineCore"] = 				"%{wks.location}/Engine/Source/Runtime/Core/Publi
 IncludeDir["EngineEvents"] = 			"%{wks.location}/Engine/Source/Runtime/Events/Public"
 IncludeDir["EngineGameframework"] = 	"%{wks.location}/Engine/Source/Runtime/GameFramework/Public"
 IncludeDir["EnginePlatformWindows"] = 	"%{wks.location}/Engine/Source/Runtime/Platform/Windows/Public"
+IncludeDir["EngineInterface"] = 			"%{wks.location}/Engine/Source/Runtime/RenderAPI/Interface/Public"
 IncludeDir["EngineVulkan"] = 			"%{wks.location}/Engine/Source/Runtime/RenderAPI/Vulkan/Public"
 
 IncludeDir["VulkanSDK"] = 				"%{VULKAN_SDK}/Include"
@@ -63,6 +64,7 @@ project "Engine"
 		"%{IncludeDir.EngineEvents}",
 		"%{IncludeDir.EngineGameframework}",
 		"%{IncludeDir.EnginePlatformWindows}",
+		"%{IncludeDir.EngineInterface}",
 		"%{IncludeDir.EngineVulkan}",
 
 		"%{IncludeDir.VulkanSDK}",

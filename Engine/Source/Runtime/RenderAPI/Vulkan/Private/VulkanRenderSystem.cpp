@@ -2,6 +2,7 @@
 
 #include "VulkanRenderSystem.h"
 #include "VulkanPipeline.h"
+#include "Camera.h"
 
 // glm
 #include <glm.hpp>
@@ -78,7 +79,7 @@ namespace Goss
 	{
 		lvePipeline->Bind(commandBuffer);
 
-		const auto projectionView = camera.GetProjection() * camera.GetView();
+		const auto projectionView = camera.GetViewProjectionMatrix();
 
 		for (GameObject& gameObject : gameObjects)
 		{
