@@ -20,7 +20,7 @@ namespace Goss
 		alignas(16) glm::vec3 color{};
 	};
 
-	VulkanRenderSystem::VulkanRenderSystem(VulkanDevice& device, const VkRenderPass renderPass) : lveDevice{device}
+	VulkanRenderSystem::VulkanRenderSystem(VulkanDevice& device, const VkRenderPass renderPass) : device{device}
 	{
 		CreatePipelineLayout();
 		CreatePipeline(renderPass);
@@ -28,7 +28,8 @@ namespace Goss
 
 	VulkanRenderSystem::~VulkanRenderSystem()
 	{
-		vkDestroyPipelineLayout(lveDevice.GetDevice(), pipelineLayout, nullptr);
+		vkDestroyPipelineLayout(device.GetDevice(), pipelineLayout, nullptr);
+
 	}
 
 	void VulkanRenderSystem::CreatePipelineLayout()
@@ -45,7 +46,7 @@ namespace Goss
 		pipelineLayoutInfo.pushConstantRangeCount = 1;
 		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 
-		if (vkCreatePipelineLayout(lveDevice.GetDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
+		if (vkCreatePipelineLayout(device.GetDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
@@ -59,8 +60,8 @@ namespace Goss
 		VulkanPipeline::DefaultPipelineConfigInfo(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		lvePipeline = std::make_unique<VulkanPipeline>(
-			lveDevice,
+		pipeline = std::make_unique<VulkanPipeline>(
+			device,
 			"../engine/shaders/simple_shader.vert.spv",
 			"../engine/shaders/simple_shader.frag.spv",
 			pipelineConfig);
@@ -77,7 +78,7 @@ namespace Goss
 
 	void VulkanRenderSystem::Render(const VkCommandBuffer commandBuffer, std::vector<GameObject>& gameObjects, const Camera& camera) const
 	{
-		lvePipeline->Bind(commandBuffer);
+		pipeline->Bind(commandBuffer);
 
 		const auto& projectionView = camera.GetViewProjectionMatrix();
 

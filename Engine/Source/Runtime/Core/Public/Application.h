@@ -56,6 +56,7 @@ namespace Goss
 		bool isMinimized = false;
 
 		LayerStack layerStack;
+
 		float lastFrameTime = 0.0f;
 
 		static Application* instance;

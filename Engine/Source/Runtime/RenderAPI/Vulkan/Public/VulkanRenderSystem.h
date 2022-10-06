@@ -22,9 +22,9 @@ namespace Goss
 		void CreatePipelineLayout();
 		void CreatePipeline(VkRenderPass renderPass);
 
-		VulkanDevice &lveDevice;
+		VulkanDevice& device;
 
-		std::unique_ptr<VulkanPipeline> lvePipeline;
+		std::unique_ptr<VulkanPipeline> pipeline;
 		VkPipelineLayout pipelineLayout;
 	};
 } 

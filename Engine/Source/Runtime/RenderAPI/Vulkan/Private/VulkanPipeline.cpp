@@ -15,7 +15,6 @@ namespace Goss
 		CreateGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
 	}
 
-
 	VulkanPipeline::~VulkanPipeline()
 	{
 		const VkDevice device = engineDevice.GetDevice();

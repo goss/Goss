@@ -27,16 +27,19 @@ namespace Goss
 
 		virtual ~Window();
 
-		virtual void OnUpdate() = 0;
+		virtual void Tick() = 0;
 
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
 
+		virtual bool ShouldClose() const { return false;}
+
 		virtual void SetEventCallback(const EventCallbackFunc& callback) = 0;
+
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
-		virtual void* GetNativeWindow() const = 0;
+		virtual void* GetWindow() const = 0;
 
 		static Scope<Window> Create(const WindowProperties& props = WindowProperties());
 	};

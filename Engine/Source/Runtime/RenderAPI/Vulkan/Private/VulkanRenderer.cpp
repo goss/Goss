@@ -1,10 +1,13 @@
 #include "gepch.h"
 
 #include "VulkanRenderer.h"
+#include "Window.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Goss
 {
-	VulkanRenderer::VulkanRenderer(VulkanWindow& window, VulkanDevice& device) : window{window}, device{device}
+	VulkanRenderer::VulkanRenderer(Window& window, VulkanDevice& device) : window{window}, device{device}
 	{
 		RecreateSwapChain();
 		CreateCommandBuffers();
@@ -14,12 +17,13 @@ namespace Goss
 
 	void VulkanRenderer::RecreateSwapChain()
 	{
-		VkExtent2D extent = window.GetExtent();
+		VkExtent2D extent = GetExtent();
 		while (extent.width == 0 || extent.height == 0)
 		{
-			extent = window.GetExtent();
+			extent = GetExtent();
 			glfwWaitEvents();
 		}
+
 		vkDeviceWaitIdle(device.GetDevice());
 
 		if (swapChain == nullptr)
@@ -100,9 +104,9 @@ namespace Goss
 		}
 
 		const VkResult result = swapChain->SubmitCommandBuffers(&commandBuffer, &currentImageIndex);
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window.WasWindowResized())
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)// || window.WasWindowResized())
 		{
-			window.ResetResizedFlag();
+			//window.ResetResizedFlag();
 			RecreateSwapChain();
 		}
 		else if (result != VK_SUCCESS)

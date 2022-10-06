@@ -15,21 +15,24 @@ namespace Goss
 		explicit WindowsWindow(const WindowProperties& props);
 		~WindowsWindow() override;
 
-		void OnUpdate() override;
+		void Tick() override;
 
 		unsigned int GetWidth() const override { return windowData.width; }
 		unsigned int GetHeight() const override { return windowData.height; }
 
-		// Window attributes
+		bool ShouldClose() const override { return glfwWindowShouldClose(window);}
+
 		void SetEventCallback(const EventCallbackFunc& callback) override { windowData.eventCallback = callback; }
+
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 
-		void* GetNativeWindow() const override { return window; }
+		void* GetWindow() const override { return window; }
+
 	private:
 		void Init(const WindowProperties& props);
 		void Shutdown() const;
-	private:
+
 		GLFWwindow* window;
 		Scope<GraphicsContext> context;
 

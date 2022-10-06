@@ -1,5 +1,7 @@
 #pragma once
-#include "VulkanWindow.h"
+#include "Window.h"
+
+#include <vulkan/vulkan_core.h>
 
 namespace Goss
 {
@@ -28,7 +30,7 @@ namespace Goss
 		const bool enableValidationLayers = true;
 #endif
 
-		explicit VulkanDevice(VulkanWindow& window);
+		explicit VulkanDevice(const Window& window);
 		~VulkanDevice();
 
 		// Not copyable or movable
@@ -60,7 +62,7 @@ namespace Goss
 	private:
 		void CreateInstance();
 		void SetupDebugMessenger();
-		void CreateSurface();
+		void CreateSurface(const Window& window );
 		void PickPhysicalDevice();
 		void CreateLogicalDevice();
 		void CreateCommandPool();
@@ -74,8 +76,6 @@ namespace Goss
 		void HasGFLWRequiredInstanceExtensions() const;
 		bool CheckDeviceExtensionSupport(VkPhysicalDevice device) const;
 		SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device) const;
-
-		VulkanWindow& window;
 
 		VkInstance instance{};
 		VkDebugUtilsMessengerEXT debugMessenger{};

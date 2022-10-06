@@ -5,6 +5,9 @@
 
 #include <set>
 
+#include "Window.h"
+#include "GLFW/glfw3.h"
+
 namespace Goss
 {
 	// local callback functions
@@ -38,11 +41,11 @@ namespace Goss
 		}
 	}
 
-	VulkanDevice::VulkanDevice(VulkanWindow& window) : window{window}
+	VulkanDevice::VulkanDevice(const Window& window)
 	{
 		CreateInstance();
 		SetupDebugMessenger();
-		CreateSurface();
+		CreateSurface(window);
 		PickPhysicalDevice();
 		CreateLogicalDevice();
 		CreateCommandPool();
@@ -206,9 +209,13 @@ namespace Goss
 		}
 	}
 
-	void VulkanDevice::CreateSurface()
+	void VulkanDevice::CreateSurface(const Window& window)
 	{
-		window.CreateWindowSurface(instance, &vkSurfaceKHR);
+		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(window.GetWindow());
+		if (glfwCreateWindowSurface(instance, glfwWindow, nullptr, &vkSurfaceKHR))
+		{
+			throw std::runtime_error("Failed to create window surface");
+		}
 	}
 
 	bool VulkanDevice::IsDeviceSuitable(VkPhysicalDevice device) const
@@ -321,7 +328,7 @@ namespace Goss
 		GE_CORE_INFO("Required extensions:");
 		const auto requiredExtensions = GetRequiredExtensions();
 		for (const auto& required : requiredExtensions)
-		{;
+		{
 			GE_CORE_TRACE("\t {}", required);
 			if (available.find(required) == available.end())
 			{

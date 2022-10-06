@@ -19,20 +19,16 @@ namespace Goss
 
 	WindowsWindow::WindowsWindow(const WindowProperties& props)
 	{
-		//GE_PROFILE_FUNCTION();
 		Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
 	{
-		//GE_PROFILE_FUNCTION();
 		Shutdown();
 	}
 
 	void WindowsWindow::Init(const WindowProperties& props)
 	{
-		//HZ_PROFILE_FUNCTION();
-
 		windowData.title = props.title;
 		windowData.width = props.width;
 		windowData.height = props.height;
@@ -41,14 +37,12 @@ namespace Goss
 
 		if (glfwWindowCount == 0)
 		{
-			//GE_PROFILE_SCOPE("glfwInit");
 			const int success = glfwInit();
 			GE_CORE_ASSERT(success, "Could not initialize GLFW!")
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
 		{
-			//GE_PROFILE_SCOPE("glfwCreateWindow");
 		#if defined(GE_DEBUG)
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 			glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -162,8 +156,6 @@ namespace Goss
 
 	void WindowsWindow::Shutdown() const
 	{
-		//GE_PROFILE_FUNCTION();
-
 		glfwDestroyWindow(window);
 		--glfwWindowCount;
 
@@ -173,18 +165,14 @@ namespace Goss
 		}
 	}
 
-	void WindowsWindow::OnUpdate()
+	void WindowsWindow::Tick()
 	{
-		//GE_PROFILE_FUNCTION();
-
 		glfwPollEvents();
-		//context->SwapBuffers();
+		context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(const bool enabled)
 	{
-		//GE_PROFILE_FUNCTION();
-
 		if (enabled)
 			glfwSwapInterval(1);
 		else
@@ -197,5 +185,4 @@ namespace Goss
 	{
 		return windowData.vSync;
 	}
-
 }

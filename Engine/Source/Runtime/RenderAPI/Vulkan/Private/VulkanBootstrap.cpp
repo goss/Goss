@@ -9,53 +9,37 @@
 
 namespace Goss
 {
-	VulkanBootstrap::VulkanBootstrap()
+	VulkanBootstrap::VulkanBootstrap(Window& window) : window(window)
 	{
 		LoadGameObjects();
 	}
 
 	VulkanBootstrap::~VulkanBootstrap() = default;
 
-	void VulkanBootstrap::Run()
+	void VulkanBootstrap::Run(const Timestep timestep)
 	{
 		const VulkanRenderSystem renderSystem{device, renderer.GetSwapChainRenderPass()};
-			const float aspect = renderer.GetAspectRatio();
+		const float aspect = renderer.GetAspectRatio();
 
 		OrthographicCamera camera(-1, 1, 1, -1);
 		//camera.SetViewTarget(glm::vec3(-1.f, -2.f, -2.f), glm::vec3(0.f, 0.f, 2.5f));
 		//camera.SetOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
 		//camera.SetPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 100.f);
 
-		currentTime = std::chrono::high_resolution_clock::now();
-		while (!window.ShouldClose())
+		renderSystem.Tick(timestep.GetSeconds() , gameObjects);
+
+		if (const VkCommandBuffer commandBuffer = renderer.BeginFrame()) 
 		{
-			glfwPollEvents();
-
-			const auto newTime = std::chrono::high_resolution_clock::now();
-			frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
-			currentTime = newTime;
-			accumulator += frameTime;
-
-			while(accumulator >= deltaTime)
-			{
-				elapsedTime += deltaTime;
-				accumulator -= deltaTime;
-			}
-
-			renderSystem.Tick(frameTime , gameObjects);
-
-			if (const VkCommandBuffer commandBuffer = renderer.BeginFrame()) 
-			{
-				renderer.BeginSwapChainRenderPass(commandBuffer);
-				renderSystem.Render(commandBuffer, gameObjects, camera);
-				renderer.EndSwapChainRenderPass(commandBuffer);
-				renderer.EndFrame();
-			}
+			renderer.BeginSwapChainRenderPass(commandBuffer);
+			renderSystem.Render(commandBuffer, gameObjects, camera);
+			renderer.EndSwapChainRenderPass(commandBuffer);
+			renderer.EndFrame();
 		}
 
 		vkDeviceWaitIdle(device.GetDevice());
 	}
 
+	//TODO Move to sandbox layer
 	void VulkanBootstrap::LoadGameObjects()
 	{
 		const std::shared_ptr model = CreateCubeModel({0.0f, 0.0f, 0.0f});

@@ -4,8 +4,6 @@
 #include "Core.h"
 #include "Renderer.h"
 #include "RendererAPI.h"
-#include "VulkanWindow.h"
-
 
 namespace Goss
 {

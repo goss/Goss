@@ -19,10 +19,10 @@ namespace Goss
 		const glm::mat4& GetProjectionMatrix() const { return projectionMatrix; }
 		const glm::mat4& GetViewMatrix() const { return viewMatrix; }
 		const glm::mat4& GetViewProjectionMatrix() const { return viewProjectionMatrix; }
-	protected:
-		glm::mat4 projectionMatrix{};
-		glm::mat4 viewMatrix{1.f};
-		glm::mat4 viewProjectionMatrix{1.f};
-	};
 
+	protected:
+		glm::mat4 projectionMatrix{1.0f};
+		glm::mat4 viewMatrix{1.0f};
+		glm::mat4 viewProjectionMatrix{1.0f};
+	};
 }

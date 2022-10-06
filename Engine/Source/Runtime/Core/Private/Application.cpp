@@ -92,7 +92,7 @@ namespace Goss
 					layer->OnUpdate(timeStep);
 				}
 			}
-			window->OnUpdate();
+			window->Tick();
 		}
 	}
 

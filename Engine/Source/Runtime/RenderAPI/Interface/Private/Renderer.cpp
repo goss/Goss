@@ -28,7 +28,7 @@ namespace Goss
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginScene(const OrthographicCamera& camera)
+	void Renderer::BeginScene(const Camera& camera)
 	{
 		sceneData->viewProjectionMatrix = camera.GetViewProjectionMatrix();
 	}

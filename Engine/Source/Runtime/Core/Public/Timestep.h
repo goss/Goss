@@ -5,17 +5,16 @@ namespace Goss
 	class Timestep
 	{
 	public:
-		Timestep(float time = 0.0f)
-			: m_Time(time)
+		Timestep(const float time = 0.0f) : time(time)
 		{
 		}
 
-		operator float() const { return m_Time; }
+		explicit operator float() const { return time; }
 
-		float GetSeconds() const { return m_Time; }
-		float GetMilliseconds() const { return m_Time * 1000.0f; }
+		float GetSeconds() const { return time; }
+		float GetMilliseconds() const { return time * 1000.0f; }
 	private:
-		float m_Time;
+		float time;
 	};
 
 }
