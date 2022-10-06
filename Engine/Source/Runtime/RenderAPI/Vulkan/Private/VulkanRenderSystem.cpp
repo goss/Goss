@@ -79,7 +79,7 @@ namespace Goss
 	{
 		lvePipeline->Bind(commandBuffer);
 
-		const auto projectionView = camera.GetViewProjectionMatrix();
+		const auto& projectionView = camera.GetViewProjectionMatrix();
 
 		for (GameObject& gameObject : gameObjects)
 		{

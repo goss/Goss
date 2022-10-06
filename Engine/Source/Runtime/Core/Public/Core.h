@@ -2,6 +2,7 @@
 #include "Platform.h"
 
 #include <memory>
+#include <filesystem>
 
 #ifdef GE_PLATFORM_WINDOWS
 	#ifdef GE_BUILD_DLL

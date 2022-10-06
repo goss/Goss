@@ -1,13 +1,14 @@
 #include "gepch.h"
 #include "WindowsWindow.h"
+
 #include "ApplicationEvent.h"
+#include "Core.h"
 #include "KeyEvent.h"
 #include "MouseEvent.h"
+#include "Renderer.h"
 
-//#include "Input.h"
-//#include "Hazel/Renderer/Renderer.h"
-
-namespace Goss {
+namespace Goss
+{
 	
 	static uint8_t glfwWindowCount = 0;
 
@@ -49,17 +50,19 @@ namespace Goss {
 		{
 			//GE_PROFILE_SCOPE("glfwCreateWindow");
 		#if defined(GE_DEBUG)
-				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-				glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-			//if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
-			//	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+			glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+			{
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			}
 		#endif
 			window = glfwCreateWindow(static_cast<int>(props.width), static_cast<int>(props.height), windowData.title.c_str(), nullptr, nullptr);
 			++glfwWindowCount;
 		}
 
-		//m_Context = GraphicsContext::Create(window);
-		//m_Context->Init();
+		context = GraphicsContext::Create(window);
+		context->Init();
 
 		glfwSetWindowUserPointer(window, &windowData);
 		SetVSync(true);
@@ -175,7 +178,7 @@ namespace Goss {
 		//GE_PROFILE_FUNCTION();
 
 		glfwPollEvents();
-		//m_Context->SwapBuffers();
+		//context->SwapBuffers();
 	}
 
 	void WindowsWindow::SetVSync(const bool enabled)

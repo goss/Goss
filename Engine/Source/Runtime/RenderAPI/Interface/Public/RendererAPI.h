@@ -3,8 +3,8 @@
 
 #include <glm.hpp>
 
-namespace Goss {
-
+namespace Goss
+{
 	class RendererAPI
 	{
 	public:
@@ -32,5 +32,4 @@ namespace Goss {
 	private:
 		static API api;
 	};
-
 }

@@ -5,6 +5,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "GraphicsContext.h"
+
 namespace Goss
 {
 	class WindowsWindow final : public Window
@@ -29,7 +31,7 @@ namespace Goss
 		void Shutdown() const;
 	private:
 		GLFWwindow* window;
-		//Scope<GraphicsContext> m_Context;
+		Scope<GraphicsContext> context;
 
 		struct WindowData
 		{
