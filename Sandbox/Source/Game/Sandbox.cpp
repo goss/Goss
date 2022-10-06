@@ -1,17 +1,24 @@
 #include <Engine.h>
 
-namespace Goss
+class Sandbox final : public Goss::Application
 {
-	class Sandbox final : public Application
+public:
+	explicit Sandbox(const Goss::ApplicationSpecification& specification)
+	: Application(specification)
 	{
-	public:
-		Sandbox() = default;
-		~Sandbox() override = default;
-	};
-
-	Application* CreateApplication()
-	{
-		GE_CORE_INFO("Creating Sandbox Application");
-		return new Sandbox();
+		//PushLayer(new SandboxLayer());
 	}
+	~Sandbox() override = default;
+};
+
+Goss::Application* CreateApplication(const Goss::ApplicationCommandLineArgs args)
+{
+	GE_CORE_INFO("Creating Sandbox Application");
+
+	Goss::ApplicationSpecification spec;
+	spec.name = "Sandbox";
+	spec.workingDirectory = "../Sandbox";
+	spec.commandLineArgs = args;
+
+	return new Sandbox(Goss::ApplicationSpecification{});
 }
