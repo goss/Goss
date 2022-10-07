@@ -8,7 +8,7 @@ namespace Goss
 {
 	class VulkanRenderSystem
 	{
-		public:
+	public:
 		VulkanRenderSystem(VulkanDevice &device, VkRenderPass renderPass);
 		~VulkanRenderSystem();
 
@@ -18,7 +18,7 @@ namespace Goss
 		void Tick(float deltaTime, std::vector<GameObject>& gameObjects) const;
 		void Render(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects, const Camera& camera) const;
 
-		private:
+	private:
 		void CreatePipelineLayout();
 		void CreatePipeline(VkRenderPass renderPass);
 

@@ -46,13 +46,13 @@ namespace Goss
 		void CompileOrGetOpenGLBinaries();
 		void CreateProgram();
 		void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
-	private:
+
 		uint32_t rendererId;
 		std::string filePath;
 		std::string shaderName;
 
 		std::unordered_map<GLenum, std::vector<uint32_t>> vulkanSpirv;
-		std::unordered_map<GLenum, std::vector<uint32_t>> openGlspirv;
+		std::unordered_map<GLenum, std::vector<uint32_t>> openGLSpirv;
 
 		std::unordered_map<GLenum, std::string> openGLSourceCode;
 	};

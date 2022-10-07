@@ -50,7 +50,8 @@ namespace Goss {
 
 	void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
 	{
-		GE_CORE_ASSERT(!Exists(name), "Shader already exists!");
+		GE_CORE_ASSERT(!name.empty(), "Filename is empty")
+		GE_CORE_ASSERT(!Exists(name), "Shader already exists!")
 		shaders[name] = shader;
 	}
 
@@ -76,7 +77,7 @@ namespace Goss {
 
 	Ref<Shader> ShaderLibrary::Get(const std::string& name)
 	{
-		GE_CORE_ASSERT(Exists(name), "Shader not found!");
+		GE_CORE_ASSERT(Exists(name), "Shader not found!")
 		return shaders[name];
 	}
 

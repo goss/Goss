@@ -13,5 +13,4 @@ namespace Goss
 	protected:
 			virtual void Initialize() = 0;
 	};
-
 }

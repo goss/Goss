@@ -52,8 +52,7 @@ namespace Goss
 
 		static const char* GetCacheDirectory()
 		{
-			// TODO: make sure the assets directory is valid
-			return "assets/cache/shader/opengl";
+			return "Assets/Cache/Shader/OpenGL";
 		}
 
 		static void CreateCacheDirectoryIfNeeded()
@@ -88,17 +87,18 @@ namespace Goss
 		}
 	}
 
-	OpenGLShader::OpenGLShader(std::string filepath)
-		: filePath(std::move(filepath))
+	OpenGLShader::OpenGLShader(std::string filepath) : filePath(std::move(filepath))
 	{
-		//GE_CORE_INFO(filepath);
+		GE_CORE_INFO(filePath);
 		Utils::CreateCacheDirectoryIfNeeded();
 		{
 			const std::string source = ReadFile(filePath);
 			const auto shaderSources = PreProcess(source);
 			const Timer timer;
+
 			CompileOrGetVulkanBinaries(shaderSources);
 			CompileOrGetOpenGLBinaries();
+
 			CreateProgram();
 			GE_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
 		}
@@ -111,15 +111,15 @@ namespace Goss
 		shaderName = filePath.substr(lastSlash, count);
 	}
 
-	OpenGLShader::OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc)
-			: shaderName(std::move(name))
+	OpenGLShader::OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc) : shaderName(std::move(name))
 	{
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
 
 		CompileOrGetVulkanBinaries(sources);
-		//CompileOrGetOpenGLBinaries();
+		CompileOrGetOpenGLBinaries();
+
 		CreateProgram();
 	}
 
@@ -183,8 +183,7 @@ namespace Goss
 
 	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
 	{
-		glCreateProgram();
-
+		shaderc::Compiler compiler{};
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
 		//options.SetOptimizationLevel(shaderc_optimization_level_performance);
@@ -211,26 +210,22 @@ namespace Goss
 			}
 			else
 			{
-				if(!filePath.empty())
+				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), filePath.c_str(), options);
+				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
 				{
-					shaderc::Compiler compiler;
-					shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), filePath.c_str(), options);
-					if (module.GetCompilationStatus() != shaderc_compilation_status_success)
-					{
-						GE_CORE_ERROR(module.GetErrorMessage());
-						GE_CORE_ASSERT(false)
-					}
+					GE_CORE_ERROR(module.GetErrorMessage());
+					GE_CORE_ASSERT(false);
+				}
 
-					shaderData[stage] = std::vector(module.cbegin(), module.cend());
+				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
 
-					std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
-					if (out.is_open())
-					{
-						auto& data = shaderData[stage];
-						out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
-						out.flush();
-						out.close();
-					}
+				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
+				if (out.is_open())
+				{
+					auto& data = shaderData[stage];
+					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
+					out.flush();
+					out.close();
 				}
 			}
 		}
@@ -241,8 +236,9 @@ namespace Goss
 
 	void OpenGLShader::CompileOrGetOpenGLBinaries()
 	{
-		auto& shaderData = openGlspirv;
+		auto& shaderData = openGLSpirv;
 
+		shaderc::Compiler compiler{};
 		shaderc::CompileOptions options;
 		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
 		//options.SetOptimizationLevel(shaderc_optimization_level_performance);
@@ -269,7 +265,6 @@ namespace Goss
 			}
 			else
 			{
-				shaderc::Compiler compiler;
 				spirv_cross::CompilerGLSL glslCompiler(spirv);
 				openGLSourceCode[stage] = glslCompiler.compile();
 				auto& source = openGLSourceCode[stage];
@@ -278,10 +273,10 @@ namespace Goss
 				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
 				{
 					GE_CORE_ERROR(module.GetErrorMessage());
-					GE_CORE_ASSERT(false)
+					GE_CORE_ASSERT(false);
 				}
 
-				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
+				shaderData[stage] = std::vector(module.cbegin(), module.cend());
 
 				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
 				if (out.is_open())
@@ -300,11 +295,10 @@ namespace Goss
 		const GLuint program = glCreateProgram();
 
 		std::vector<GLuint> shaderIDs;
-		for (auto&& [stage, spirv] : openGlspirv)
+		for (auto&& [stage, spirv] : openGLSpirv)
 		{
 			GLuint shaderId = shaderIDs.emplace_back(glCreateShader(stage));
-			const GLsizei size = static_cast<GLsizei>(spirv.size() * sizeof(uint32_t));
-			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), size);
+			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
 			glAttachShader(program, shaderId);
 		}

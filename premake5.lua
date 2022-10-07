@@ -51,6 +51,9 @@ Library["ShaderC_Release"] = 			"%{LibraryDir.VulkanSDK}/shaderc_shared.lib"
 Library["SPIRV_Cross_Release"] = 		"%{LibraryDir.VulkanSDK}/spirv-cross-core.lib"
 Library["SPIRV_Cross_GLSL_Release"] = 	"%{LibraryDir.VulkanSDK}/spirv-cross-glsl.lib"
 
+BuildCommands = {}
+BuildCommands["CompileShaders"] =		("call $(SolutionDir)Build/Batch/CompileShaders.bat -$(ProjectDir)/Assets/Shaders");
+
 --include GLFW premade5.lua 
 --new projects should copy the glfw.lua script to Engine/ThirdParty/glfw/ folder
 --rename file to premake5.lua
@@ -72,9 +75,20 @@ project "Engine"
 
 	files
 	{
+		--Premake
+		"%{wks.location}/premake5.lua",
+		--Batch
+		"%{wks.location}/Build/Batch/**.bat",
+	
 		--Engine
 		"%{prj.name}/Source/**.h",
 		"%{prj.name}/Source/**.cpp",
+		
+		--Shaders
+		"%{prj.name}/Assets/Shaders/**.glsl",
+		"%{prj.name}/Assets/Shaders/**.vert",
+		"%{prj.name}/Assets/Shaders/**.frag",
+
 		
 		--stb_image
 		"%{prj.name}/ThirdParty/stb_image/**.h",
@@ -116,8 +130,11 @@ project "Engine"
 
 	postbuildcommands
 	{
+		("call $(SolutionDir)Build/Batch/CompileShaders.bat -$(ProjectDir)/Assets/Shaders");
 		("{COPY} %{cfg.buildtarget.relpath} ../Bin/" .. outputdir .. "/Sandbox");
 	}
+
+	--glslangValidator.exe
 
 	filter "system:windows"
 		systemversion "latest"
@@ -159,8 +176,14 @@ project "Sandbox"
 
 	files
 	{
+		--Sandbox
 		"%{prj.name}/Source/**.h",
-		"%{prj.name}/Source/**.cpp"
+		"%{prj.name}/Source/**.cpp",
+		
+		--Shaders
+		"%{prj.name}/Assets/Shaders/**.glsl",
+		"%{prj.name}/Assets/Shaders/**.vert",
+		"%{prj.name}/Assets/Shaders/**.frag",
 	}
 
 	includedirs
@@ -182,6 +205,11 @@ project "Sandbox"
 	links
 	{
 		"Engine" --project Engine
+	}
+
+	postbuildcommands
+	{
+		("call $(SolutionDir)Build/Batch/CompileShaders.bat -$(ProjectDir)/Assets/Shaders");
 	}
 
 	filter "system:windows"

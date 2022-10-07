@@ -368,4 +368,7 @@ FodyWeavers.xsd
 *.filters
 *.sln
 
-Engine/ThirdParty/
+Engine/ThirdParty/glad/
+Engine/ThirdParty/glfw/
+Engine/ThirdParty/glm/
+Engine/ThirdParty/spdlog/

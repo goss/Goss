@@ -1,9 +1,9 @@
 #pragma once
 
-#include "VulkanDevice.h"
 #include "GameObject.h"
 #include "Model.h"
 #include "Timestep.h"
+#include "VulkanDevice.h"
 #include "VulkanRenderer.h"
 
 namespace Goss

@@ -3,8 +3,8 @@
 #include "OrthographicCamera.h"
 #include "Texture.h"
 
-namespace Goss {
-
+namespace Goss
+{
 	class Renderer2D
 	{
 	public:

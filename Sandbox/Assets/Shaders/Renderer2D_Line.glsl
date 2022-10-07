@@ -1,8 +1,3 @@
-//--------------------------
-// - Hazel 2D -
-// Renderer2D Line Shader
-// --------------------------
-
 #type vertex
 #version 450 core
 
