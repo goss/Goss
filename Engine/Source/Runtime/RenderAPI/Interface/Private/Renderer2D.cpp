@@ -77,7 +77,7 @@ namespace Goss
 		std::array<Ref<Texture2D>, MAX_TEXTURE_SLOTS> textureSlots;
 		uint32_t textureSlotIndex = 1; // 0 = white texture
 
-		glm::vec4 quadVertexPositions[4];
+		glm::vec4 quadVertexPositions[4]{};
 
 		Renderer2D::Statistics stats;
 
@@ -86,13 +86,13 @@ namespace Goss
 			glm::mat4 viewProjection;
 		};
 
-		CameraData cameraBuffer;
+		CameraData cameraBuffer{};
 		Ref<UniformBuffer> cameraUniformBuffer;
 	};
 
 	static Renderer2DData data;
 
-	void Renderer2D::Init()
+	void Renderer2D::Initialize()
 	{
 		data.quadVertexArray = VertexArray::Create();
 
@@ -105,8 +105,8 @@ namespace Goss
 			{ShaderDataType::Float, "a_TilingFactor"},
 			{ShaderDataType::Int, "a_EntityID"}
 		});
-		data.quadVertexArray->AddVertexBuffer(data.quadVertexBuffer);
 
+		data.quadVertexArray->AddVertexBuffer(data.quadVertexBuffer);
 		data.quadVertexBufferBase = new QuadVertex[Renderer2DData::MAX_VERTICES];
 
 		const auto quadIndices = new uint32_t[Renderer2DData::MAX_INDICES];
@@ -163,11 +163,13 @@ namespace Goss
 
 		int32_t samplers[Renderer2DData::MAX_TEXTURE_SLOTS]{};
 		for (uint32_t i = 0; i < Renderer2DData::MAX_TEXTURE_SLOTS; i++)
+		{
 			samplers[i] = i;
+		}
 
-		data.quadShader = Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
-		data.circleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
-		data.lineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
+		data.quadShader = Shader::Create("Assets/Shaders/Renderer2D_Quad.glsl");
+		data.circleShader = Shader::Create("Assets/Shaders/Renderer2D_Circle.glsl");
+		data.lineShader = Shader::Create("Assets/Shaders/Renderer2D_Line.glsl");
 
 		// Set first texture slot to 0
 		data.textureSlots[0] = data.whiteTexture;
@@ -450,7 +452,7 @@ namespace Goss
 
 	void Renderer2D::DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityId)
 	{
-		glm::vec3 lineVertices[4];
+		glm::vec3 lineVertices[4]{};
 		for (size_t i = 0; i < 4; i++)
 			lineVertices[i] = transform * data.quadVertexPositions[i];
 

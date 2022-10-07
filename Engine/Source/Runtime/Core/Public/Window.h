@@ -12,9 +12,9 @@ namespace Goss
 		uint32_t width;
 		uint32_t height;
 
-		explicit WindowProperties(std::string title = "Hazel Engine",
-		                     const uint32_t width = 800,
-		                     const uint32_t height = 600)
+		explicit WindowProperties(std::string title = "Goss",
+		                     const uint32_t width = 1280,
+		                     const uint32_t height = 720)
 			: title(std::move(title)), width(width), height(height)
 		{
 		}
@@ -39,9 +39,8 @@ namespace Goss
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 
-		virtual void* GetWindow() const = 0;
+		virtual void* GetHandle() const = 0;
 
 		static Scope<Window> Create(const WindowProperties& props = WindowProperties());
 	};
-
 }

@@ -6,24 +6,17 @@ namespace Goss
 {
 	enum class FramebufferTextureFormat
 	{
-		None = 0,
-
-		// Color
+		None,
 		RGBA8,
 		RedInteger,
-
-		// Depth/stencil
-		Depth24Stencil8,
-
-		// Defaults
-		Depth = Depth24Stencil8
+		Depth24Stencil8
 	};
 
 	struct FramebufferTextureSpecification
 	{
 		FramebufferTextureSpecification() = default;
 
-		explicit FramebufferTextureSpecification(const FramebufferTextureFormat format)
+		FramebufferTextureSpecification(const FramebufferTextureFormat format)
 			: textureFormat(format) {}
 
 		FramebufferTextureFormat textureFormat = FramebufferTextureFormat::None;
@@ -67,6 +60,4 @@ namespace Goss
 
 		static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
 	};
-
-
 }

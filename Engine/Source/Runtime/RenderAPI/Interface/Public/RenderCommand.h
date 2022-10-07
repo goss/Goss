@@ -3,14 +3,14 @@
 #include "RendererAPI.h"
 #include "VertexArray.h"
 
-namespace Goss {
-
+namespace Goss
+{
 	class RenderCommand
 	{
 	public:
-		static void Init()
+		static void Initialize()
 		{
-			rendererAPI->Init();
+			rendererAPI->Initialize();
 		}
 
 		static void SetViewport(const uint32_t x, const uint32_t y, const uint32_t width, const uint32_t height)

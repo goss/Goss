@@ -211,7 +211,7 @@ namespace Goss
 
 	void VulkanDevice::CreateSurface(const Window& window)
 	{
-		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(window.GetWindow());
+		GLFWwindow* glfwWindow = static_cast<GLFWwindow*>(window.GetHandle());
 		if (glfwCreateWindowSurface(instance, glfwWindow, nullptr, &vkSurfaceKHR))
 		{
 			throw std::runtime_error("Failed to create window surface");

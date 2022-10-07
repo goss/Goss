@@ -10,14 +10,14 @@ namespace Goss
 	public:
 		enum class API
 		{
-			Vulkan = 1,
+			DirectX = 1,
 			OpenGL = 2,
-			DirectX = 3
+			Vulkan = 3
 		};
 
 		virtual ~RendererAPI() = default;
 
-		virtual void Init() = 0;
+		virtual void Initialize() = 0;
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
 		virtual void SetClearColor(const glm::vec4& color) = 0;
 		virtual void Clear() = 0;

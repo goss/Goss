@@ -8,7 +8,7 @@ namespace Goss {
 	class Renderer2D
 	{
 	public:
-		static void Init();
+		static void Initialize();
 		static void Shutdown();
 
 		static void BeginScene(const Camera& camera);

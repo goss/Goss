@@ -23,11 +23,12 @@ namespace Goss
 			case ShaderDataType::Int3:     return 4 * 3;
 			case ShaderDataType::Int4:     return 4 * 4;
 			case ShaderDataType::Bool:     return 1;
-			case ShaderDataType::None: break;
-		default: ;
+			case ShaderDataType::None:	   break;
+			default: 
+				GE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+				break;
 		}
 
-		GE_CORE_ASSERT(false, "Unknown ShaderDataType!");
 		return 0;
 	}
 
@@ -60,11 +61,11 @@ namespace Goss
 				case ShaderDataType::Int3:    return 3;
 				case ShaderDataType::Int4:    return 4;
 				case ShaderDataType::Bool:    return 1;
-				case ShaderDataType::None: break;
-			default: ;
+				case ShaderDataType::None:    break;
+				default:
+					GE_CORE_ASSERT(false, "Unknown ShaderDataType!")
+					break;
 			}
-
-			GE_CORE_ASSERT(false, "Unknown ShaderDataType!");
 			return 0;
 		}
 	};
@@ -75,32 +76,32 @@ namespace Goss
 		BufferLayout() = default;
 
 		BufferLayout(const std::initializer_list<BufferElement> elements)
-			: elements(elements)
+			: bufferElements(elements)
 		{
 			CalculateOffsetsAndStride();
 		}
 
 		uint32_t GetStride() const { return stride; }
-		const std::vector<BufferElement>& GetElements() const { return elements; }
+		const std::vector<BufferElement>& GetElements() const { return bufferElements; }
 
-		std::vector<BufferElement>::iterator Begin() { return elements.begin(); }
-		std::vector<BufferElement>::iterator End() { return elements.end(); }
-		std::vector<BufferElement>::const_iterator Begin() const { return elements.begin(); }
-		std::vector<BufferElement>::const_iterator End() const { return elements.end(); }
+		std::vector<BufferElement>::iterator begin() { return bufferElements.begin(); }
+		std::vector<BufferElement>::iterator end() { return bufferElements.end(); }
+		std::vector<BufferElement>::const_iterator begin() const { return bufferElements.begin(); }
+		std::vector<BufferElement>::const_iterator end() const { return bufferElements.end(); }
 	private:
 		void CalculateOffsetsAndStride()
 		{
 			size_t offset = 0;
 			stride = 0;
-			for (auto& element : elements)
+			for (auto& element : bufferElements)
 			{
 				element.offset = offset;
 				offset += element.size;
 				stride += element.size;
 			}
 		}
-	private:
-		std::vector<BufferElement> elements;
+
+		std::vector<BufferElement> bufferElements;
 		uint32_t stride = 0;
 	};
 

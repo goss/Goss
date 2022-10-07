@@ -16,7 +16,6 @@ namespace Goss
 
 		const char* operator[](const int index) const
 		{
-			//GE_CORE_ASSERT(index < count);
 			return args[index];
 		}
 	};
@@ -31,7 +30,7 @@ namespace Goss
 	class Application
 	{
 	public:
-		explicit Application(ApplicationSpecification specification);
+		explicit Application(ApplicationSpecification spec);
 		virtual ~Application();
 
 		void Run();
@@ -62,8 +61,6 @@ namespace Goss
 		static Application* instance;
 		friend int ::main(int argc, char** argv);
 	};
-
-	Application* CreateApplication(ApplicationCommandLineArgs args);
 }
 
 extern Goss::Application* CreateApplication(Goss::ApplicationCommandLineArgs args);

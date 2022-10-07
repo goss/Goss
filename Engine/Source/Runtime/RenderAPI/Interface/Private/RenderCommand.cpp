@@ -7,5 +7,4 @@
 namespace Goss
 {
 	Scope<RendererAPI> RenderCommand::rendererAPI = RendererAPI::Create();
-
 }

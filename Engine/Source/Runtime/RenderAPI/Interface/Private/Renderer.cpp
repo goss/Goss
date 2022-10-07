@@ -12,15 +12,15 @@ namespace Goss
 {
 	Scope<Renderer::SceneData> Renderer::sceneData = CreateScope<SceneData>();
 
-	void Renderer::Init()
+	void Renderer::Initialize()
 	{
-		RenderCommand::Init();
-		Renderer2D::Init();
+		RenderCommand::Initialize();
+		//Renderer2D::Initialize();
 	}
 
 	void Renderer::Shutdown()
 	{
-		Renderer2D::Shutdown();
+		//Renderer2D::Shutdown();
 	}
 
 	void Renderer::OnWindowResize(const uint32_t width, const uint32_t height)
@@ -46,5 +46,4 @@ namespace Goss
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
 	}
-
 }

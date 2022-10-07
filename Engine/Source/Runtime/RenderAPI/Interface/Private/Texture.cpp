@@ -2,6 +2,7 @@
 #include "Texture.h"
 
 #include "Core.h"
+#include "OpenGLTexture.h"
 #include "Renderer.h"
 #include "RendererAPI.h"
 
@@ -11,12 +12,13 @@ namespace Goss
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::Vulkan:
-			case RendererAPI::API::OpenGL:
-				GE_CORE_ASSERT(false, "OpenGL not supported!")
-				break;
 			case RendererAPI::API::DirectX:
 				GE_CORE_ASSERT(false, "DirectX not supported!")
+				break;
+			case RendererAPI::API::OpenGL:
+				return CreateRef<OpenGLTexture2D>(width, height);
+			case RendererAPI::API::Vulkan:
+				GE_CORE_ASSERT(false, "Vulkan not supported!")
 				break;
 			default:
 				GE_CORE_ASSERT(false, "Unknown RendererAPI!")
@@ -29,12 +31,13 @@ namespace Goss
 	{
 		switch (Renderer::GetAPI())
 		{
-			case RendererAPI::API::Vulkan:
-			case RendererAPI::API::OpenGL:
-				GE_CORE_ASSERT(false, "OpenGL not supported!")
-				break;
 			case RendererAPI::API::DirectX:
 				GE_CORE_ASSERT(false, "DirectX not supported!")
+				break;
+			case RendererAPI::API::OpenGL:
+				return CreateRef<OpenGLTexture2D>(path);
+			case RendererAPI::API::Vulkan:
+				GE_CORE_ASSERT(false, "Vulkan not supported!")
 				break;
 			default:
 				GE_CORE_ASSERT(false, "Unknown RendererAPI!")

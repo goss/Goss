@@ -9,25 +9,13 @@
 
 namespace Goss
 {
-
 	OrthographicCameraController::OrthographicCameraController(const float aspectRatio, const bool rotation)
 		: aspectRatio(aspectRatio), camera(-aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel), rotation(rotation)
 	{
 	}
 
-	void OrthographicCameraController::OnUpdate(Timestep timeStep)
+	void OrthographicCameraController::Tick(const Timestep timeStep)
 	{
-		if (Input::IsKeyPressed(Key::A))
-		{
-			cameraPosition.x -= cos(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
-			cameraPosition.y -= sin(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
-		}
-		else if (Input::IsKeyPressed(Key::D))
-		{
-			cameraPosition.x += cos(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
-			cameraPosition.y += sin(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
-		}
-
 		if (Input::IsKeyPressed(Key::W))
 		{
 			cameraPosition.x += -sin(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
@@ -37,6 +25,17 @@ namespace Goss
 		{
 			cameraPosition.x -= -sin(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
 			cameraPosition.y -= cos(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
+		}
+
+		if (Input::IsKeyPressed(Key::A))
+		{
+			cameraPosition.x -= cos(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
+			cameraPosition.y -= sin(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
+		}
+		else if (Input::IsKeyPressed(Key::D))
+		{
+			cameraPosition.x += cos(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
+			cameraPosition.y += sin(glm::radians(cameraRotation)) * cameraTranslationSpeed * timeStep;
 		}
 
 		if (rotation)
@@ -74,8 +73,6 @@ namespace Goss
 
 	bool OrthographicCameraController::OnMouseScrolled(const MouseScrolledEvent& e)
 	{
-		
-
 		zoomLevel -= e.GetYOffset() * 0.25f;
 		zoomLevel = std::max(zoomLevel, 0.25f);
 		camera.SetProjection(-aspectRatio * zoomLevel, aspectRatio * zoomLevel, -zoomLevel, zoomLevel);
@@ -87,5 +84,4 @@ namespace Goss
 		OnResize(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
 		return false;
 	}
-
 }

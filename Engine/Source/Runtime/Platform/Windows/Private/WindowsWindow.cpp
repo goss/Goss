@@ -9,7 +9,6 @@
 
 namespace Goss
 {
-	
 	static uint8_t glfwWindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* description)
@@ -19,7 +18,7 @@ namespace Goss
 
 	WindowsWindow::WindowsWindow(const WindowProperties& props)
 	{
-		Init(props);
+		Initialize(props);
 	}
 
 	WindowsWindow::~WindowsWindow()
@@ -27,7 +26,7 @@ namespace Goss
 		Shutdown();
 	}
 
-	void WindowsWindow::Init(const WindowProperties& props)
+	void WindowsWindow::Initialize(const WindowProperties& props)
 	{
 		windowData.title = props.title;
 		windowData.width = props.width;
@@ -44,25 +43,31 @@ namespace Goss
 
 		{
 		#if defined(GE_DEBUG)
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-			glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+			switch (Renderer::GetAPI())
 			{
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+				case RendererAPI::API::DirectX: 
+					break;
+				case RendererAPI::API::OpenGL:
+					glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+					break;
+				case RendererAPI::API::Vulkan: 
+					glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+					glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+					break;
+				default: ;
 			}
 		#endif
-			window = glfwCreateWindow(static_cast<int>(props.width), static_cast<int>(props.height), windowData.title.c_str(), nullptr, nullptr);
+			windowHandle = glfwCreateWindow(static_cast<int>(props.width), static_cast<int>(props.height), windowData.title.c_str(), nullptr, nullptr);
 			++glfwWindowCount;
 		}
 
-		context = GraphicsContext::Create(window);
-		context->Init();
+		context = GraphicsContext::Create(windowHandle);
 
-		glfwSetWindowUserPointer(window, &windowData);
+		glfwSetWindowUserPointer(windowHandle, &windowData);
 		SetVSync(true);
 
 		// Set GLFW callbacks
-		glfwSetWindowSizeCallback(window, [](GLFWwindow* glfwWindow, const int width, const int height)
+		glfwSetWindowSizeCallback(windowHandle, [](GLFWwindow* glfwWindow, const int width, const int height)
 		{
 			WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(glfwWindow));
 			data.width = width;
@@ -72,14 +77,14 @@ namespace Goss
 			data.eventCallback(event);
 		});
 
-		glfwSetWindowCloseCallback(window, [](GLFWwindow* glfwWindow)
+		glfwSetWindowCloseCallback(windowHandle, [](GLFWwindow* glfwWindow)
 		{
 			const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(glfwWindow));
 			WindowCloseEvent event;
 			data.eventCallback(event);
 		});
 
-		glfwSetKeyCallback(window, [](GLFWwindow* glfwWindow, const int key, int scancode, const int action, int mods)
+		glfwSetKeyCallback(windowHandle, [](GLFWwindow* glfwWindow, const int key, int scancode, const int action, int mods)
 		{
 			const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(glfwWindow));
 
@@ -107,7 +112,7 @@ namespace Goss
 			}
 		});
 
-		glfwSetCharCallback(window, [](GLFWwindow* glfwWindow, const unsigned int keycode)
+		glfwSetCharCallback(windowHandle, [](GLFWwindow* glfwWindow, const unsigned int keycode)
 		{
 			const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(glfwWindow));
 
@@ -115,7 +120,7 @@ namespace Goss
 			data.eventCallback(event);
 		});
 
-		glfwSetMouseButtonCallback(window, [](GLFWwindow* glfwWindow, const int button, const int action, int mods)
+		glfwSetMouseButtonCallback(windowHandle, [](GLFWwindow* glfwWindow, const int button, const int action, int mods)
 		{
 			const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(glfwWindow));
 
@@ -137,7 +142,7 @@ namespace Goss
 			}
 		});
 
-		glfwSetScrollCallback(window, [](GLFWwindow* glfwWindow, const double xOffset, const double yOffset)
+		glfwSetScrollCallback(windowHandle, [](GLFWwindow* glfwWindow, const double xOffset, const double yOffset)
 		{
 			const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(glfwWindow));
 
@@ -145,7 +150,7 @@ namespace Goss
 			data.eventCallback(event);
 		});
 
-		glfwSetCursorPosCallback(window, [](GLFWwindow* glfwWindow, const double xPos, const double yPos)
+		glfwSetCursorPosCallback(windowHandle, [](GLFWwindow* glfwWindow, const double xPos, const double yPos)
 		{
 			const WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(glfwWindow));
 
@@ -156,7 +161,7 @@ namespace Goss
 
 	void WindowsWindow::Shutdown() const
 	{
-		glfwDestroyWindow(window);
+		glfwDestroyWindow(windowHandle);
 		--glfwWindowCount;
 
 		if (glfwWindowCount == 0)

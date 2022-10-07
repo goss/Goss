@@ -10,15 +10,14 @@ namespace Goss
 {
 	Application* Application::instance = nullptr;
 
-	Application::Application(ApplicationSpecification specification)
-		: specification(std::move(specification))
+	Application::Application(ApplicationSpecification spec) : specification(std::move(spec))
 	{
 		instance = this;
 
-		window = Window::Create(WindowProperties("Goss"));
+		window = Window::Create(WindowProperties{specification.name});
 		window->SetEventCallback(GE_BIND_EVENT_FN(Application::OnEvent));
 
-		Renderer::Init();
+		Renderer::Initialize();
 	}
 
 	Application::~Application()
@@ -40,7 +39,7 @@ namespace Goss
 
 	void Application::OnEvent(Event& event)
 	{
-		GE_CORE_INFO(event.ToString());
+		//GE_CORE_INFO(event.ToString());
 
 		EventDispatcher dispatcher(event);
 		dispatcher.Dispatch<WindowCloseEvent>(GE_BIND_EVENT_FN(Application::OnWindowClose));
@@ -89,7 +88,7 @@ namespace Goss
 			{
 				for (Layer* layer : layerStack)
 				{
-					layer->OnUpdate(timeStep);
+					layer->Tick(timeStep);
 				}
 			}
 			window->Tick();
@@ -100,16 +99,6 @@ namespace Goss
 	{
 		isRunning = false;
 	}
-
-	Application* CreateApplication(const ApplicationCommandLineArgs args)
-	{
-		ApplicationSpecification spec;
-		spec.name = "Engine";
-		spec.workingDirectory = "Engine";
-		spec.commandLineArgs = args;
-
-		return new Application(spec);
-	}
 }
 
 int main(const int argc, char** argv)
@@ -117,7 +106,7 @@ int main(const int argc, char** argv)
 	Goss::Log::Init();
 	GE_CORE_INFO("Creating Application");
 
-	const auto application = Goss::CreateApplication({ argc, argv });
+	const auto application = CreateApplication({ argc, argv });
 	application->Run();
 	delete application;
 	return 0;

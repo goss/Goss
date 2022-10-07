@@ -12,7 +12,7 @@ namespace Goss
 	public:
 		explicit OrthographicCameraController(float aspectRatio, bool rotation = false);
 
-		void OnUpdate(Timestep timeStep);
+		void Tick(Timestep timeStep);
 		void OnEvent(Event& e);
 
 		void OnResize(float width, float height);
