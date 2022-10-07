@@ -369,8 +369,5 @@ FodyWeavers.xsd
 *.sln
 *.hint
 
-Engine/ThirdParty/glad/
-Engine/ThirdParty/glm/
-Engine/ThirdParty/spdlog/
-Engine/ThirdParty/glfw/
+Engine/ThirdParty
 !*.lua
