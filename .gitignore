@@ -367,8 +367,10 @@ FodyWeavers.xsd
 *.vcxproj
 *.filters
 *.sln
+*.hint
 
 Engine/ThirdParty/glad/
-Engine/ThirdParty/glfw/
 Engine/ThirdParty/glm/
 Engine/ThirdParty/spdlog/
+Engine/ThirdParty/glfw/
+!*.lua
