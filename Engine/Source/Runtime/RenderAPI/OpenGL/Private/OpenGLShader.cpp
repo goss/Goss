@@ -317,23 +317,20 @@ namespace Goss
 
 		GLint blockSize;
 		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-		glUniformBlockBinding(programId, blockIndex, 0);
+		//glUniformBlockBinding(programId, blockIndex, 0);
 
+		constexpr int size =  sizeof(value);
 		const GLfloat color[] = {value.x, value.y, value.z, value.w};
 		GLubyte* blockBuffer = static_cast<GLubyte*>(malloc(blockSize));
-		memcpy(blockBuffer, color, 16);
+		memcpy(blockBuffer, color, size);
 
 		unsigned int ubo;
 		glGenBuffers(1, &ubo);
 		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-		glBufferData(GL_UNIFORM_BUFFER, 16, nullptr, GL_STATIC_DRAW); // allocate 16 bytes of memory
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW); 
 
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
-
-		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, 16, blockBuffer); 
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, size, blockBuffer); 
 
 		//const Ref<UniformBuffer> uniformBuffer = UniformBuffer::Create(blockSize, blockIndex);
 		//uniformBuffer->SetData(blockBuffer, blockSize, 0);
