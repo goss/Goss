@@ -203,7 +203,6 @@ namespace Goss
 		GE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
 		GE_CORE_TRACE("    {0} resources", resources.sampled_images.size());
 
-		GE_CORE_TRACE("Uniform buffers:");
 		for (const auto& resource : resources.uniform_buffers)
 		{
 			const auto& bufferType = compiler.get_type(resource.base_type_id);
@@ -211,7 +210,7 @@ namespace Goss
 			uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 			auto memberCount = bufferType.member_types.size();
 
-			GE_CORE_TRACE("  {0}", resource.name);
+			GE_CORE_TRACE("{0}:", resource.name);
 			GE_CORE_TRACE("    Size = {0}", bufferSize);
 			GE_CORE_TRACE("    Binding = {0}", binding);
 			GE_CORE_TRACE("    Members = {0}", memberCount);
@@ -320,9 +319,6 @@ namespace Goss
 		//glUniformBlockBinding(programId, blockIndex, 0);
 
 		constexpr int size =  sizeof(value);
-		const GLfloat color[] = {value.x, value.y, value.z, value.w};
-		GLubyte* blockBuffer = static_cast<GLubyte*>(malloc(blockSize));
-		memcpy(blockBuffer, color, size);
 
 		unsigned int ubo;
 		glGenBuffers(1, &ubo);
@@ -330,11 +326,34 @@ namespace Goss
 		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW); 
 
 		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, size, blockBuffer); 
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, size, value_ptr(value)); 
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		//const Ref<UniformBuffer> uniformBuffer = UniformBuffer::Create(blockSize, blockIndex);
 		//uniformBuffer->SetData(blockBuffer, blockSize, 0);
+	}
 
-		free(blockBuffer);
+	void OpenGLShader::SetTransformAndViewMatrix(const glm::mat4& viewProjection, const glm::mat4& position)
+	{
+		const GLuint blockIndex = glGetUniformBlockIndex(programId, "ViewMatrixBuffer");
+
+		GLint blockSize;
+		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+		//glUniformBlockBinding(programId, blockIndex, 1);
+
+		constexpr int size =  sizeof(glm::mat4);
+
+		unsigned int ubo;
+		glGenBuffers(1, &ubo);
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+		glBufferData(GL_UNIFORM_BUFFER, static_cast<GLsizeiptr>(2) * size, nullptr, GL_STATIC_DRAW);
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, 1, ubo);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, size, value_ptr(viewProjection));
+		glBufferSubData(GL_UNIFORM_BUFFER, size, size, value_ptr(position));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		//const Ref<UniformBuffer> uniformBuffer = UniformBuffer::Create(blockSize, blockIndex);
+		//uniformBuffer->SetData(blockBuffer, blockSize, 0);
 	}
 }

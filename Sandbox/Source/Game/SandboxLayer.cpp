@@ -31,8 +31,7 @@ SandboxLayer::SandboxLayer()
 	//textureShader = shaderLibrary.Load("Texture");
 
 	flatColorShader->Bind();
-	//flatColorShader->SetFloat4("color", glm::vec4 { 1.0f, 1.0f, 0.0f, 1.0f });
-	flatColorShader->SetColor( glm::vec4 { 1.0f, 0.5f, 0.0f, 1.0f });
+	flatColorShader->SetColor(glm::vec4 { 1.0f, 0.5f, 0.0f, 1.0f });
 
 	//textureShader->Bind();
 	//textureShader->SetInt("u_Texture", 0);
@@ -55,9 +54,14 @@ void SandboxLayer::Tick(const Timestep timestep)
 	RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	RenderCommand::Clear();
 
+	const glm::mat4 transform = glm::mat4(1.0f);
+	static float angle = 0;
+	angle += 0.001f * timestep.GetMilliseconds();
+	const auto mat = rotate(transform, angle, glm::vec3(0, 0, 1));
+
 	Renderer::BeginScene(cameraController.GetCamera());
 
-	Renderer::Submit(flatColorShader, vertexArray); 
+	Renderer::Submit(flatColorShader, vertexArray, mat); 
 
 	Renderer::EndScene();
 }

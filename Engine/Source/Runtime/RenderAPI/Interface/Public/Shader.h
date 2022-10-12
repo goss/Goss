@@ -20,7 +20,9 @@ namespace Goss
 		virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value) = 0;
 		virtual void SetMat4(const std::string& name, const glm::mat4& value) = 0;
+
 		virtual void SetColor(const glm::vec4& value) = 0;
+		virtual void SetTransformAndViewMatrix(const glm::mat4& viewProjection, const glm::mat4& position) = 0;
 
 		virtual const std::string& GetName() const = 0;
 

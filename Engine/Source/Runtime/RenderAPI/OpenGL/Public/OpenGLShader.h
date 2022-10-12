@@ -17,6 +17,7 @@ namespace Goss
 		void Bind() const override;
 		void Unbind() const override;
 
+		/*Uniforms*/
 		void SetInt(const std::string& name, int value) override;
 		void SetIntArray(const std::string& name, int* values, uint32_t count) override;
 		void SetFloat(const std::string& name, float value) override;
@@ -25,10 +26,13 @@ namespace Goss
 		void SetFloat4(const std::string& name, const glm::vec4& value) override;
 		void SetMat4(const std::string& name, const glm::mat4& value) override;
 
+		/*Uniform Buffers*/
 		void SetColor(const glm::vec4& value) override;
+		void SetTransformAndViewMatrix(const glm::mat4& viewProjection, const glm::mat4& position) override;
 
 		const std::string& GetName() const override { return shaderName; }
 
+private:
 		void UploadUniformInt(const std::string& name, int value) const;
 		void UploadUniformIntArray(const std::string& name, const int* values, uint32_t count) const;
 
@@ -39,7 +43,7 @@ namespace Goss
 
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const;
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const;
-	private:
+
 		static std::string ReadFile(const std::string& name);
 
 		void GetShaderBinaries(const std::unordered_map<GLuint, std::string>& sources);
