@@ -11,6 +11,6 @@ namespace Goss
 
 		void SetData(const void* data, uint32_t size, uint32_t offset = 0) override;
 	private:
-		uint32_t rendererID = 0;
+		uint32_t rendererId = 0;
 	};
 }

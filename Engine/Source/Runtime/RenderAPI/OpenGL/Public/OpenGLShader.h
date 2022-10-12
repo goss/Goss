@@ -3,15 +3,14 @@
 #include "Shader.h"
 #include <glm.hpp>
 
-// TODO: REMOVE!
-typedef unsigned int GLenum;
+#include "glad/glad.h"
 
 namespace Goss
 {
 	class OpenGLShader final : public Shader
 	{
 	public:
-		explicit OpenGLShader(std::string filepath);
+		explicit OpenGLShader(std::string name);
 		OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc);
 		~OpenGLShader() override;
 
@@ -26,6 +25,8 @@ namespace Goss
 		void SetFloat4(const std::string& name, const glm::vec4& value) override;
 		void SetMat4(const std::string& name, const glm::mat4& value) override;
 
+		void SetColor(const glm::vec4& value) override;
+
 		const std::string& GetName() const override { return shaderName; }
 
 		void UploadUniformInt(const std::string& name, int value) const;
@@ -39,22 +40,16 @@ namespace Goss
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const;
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const;
 	private:
-		static std::string ReadFile(const std::string& filepath);
-		static std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
+		static std::string ReadFile(const std::string& name);
 
-		void CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources);
-		void CompileOrGetOpenGLBinaries();
+		void GetShaderBinaries(const std::unordered_map<GLuint, std::string>& sources);
 		void CreateProgram();
-		void Reflect(GLenum stage, const std::vector<uint32_t>& shaderData);
+		void Reflect(GLuint stage, const std::vector<uint32_t>& shaderData);
 
-		uint32_t rendererId;
-		std::string filePath;
+		uint32_t programId;
 		std::string shaderName;
 
-		std::unordered_map<GLenum, std::vector<uint32_t>> vulkanSpirv;
-		std::unordered_map<GLenum, std::vector<uint32_t>> openGLSpirv;
-
-		std::unordered_map<GLenum, std::string> openGLSourceCode;
+		std::unordered_map<GLuint, std::vector<uint32_t>> shaderSources;
 	};
 
 }

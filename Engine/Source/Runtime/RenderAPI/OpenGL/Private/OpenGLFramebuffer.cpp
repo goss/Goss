@@ -219,8 +219,7 @@ namespace Goss
 		GE_CORE_ASSERT(attachmentIndex < colorAttachments.size())
 
 		const auto& spec = colorAttachmentSpecifications[attachmentIndex];
-		glClearTexImage(colorAttachments[attachmentIndex], 0,
-			Utils::TextureFormatToGL(spec.textureFormat), GL_INT, &value);
+		glClearTexImage(colorAttachments[attachmentIndex], 0, Utils::TextureFormatToGL(spec.textureFormat), GL_INT, &value);
 	}
 
 }

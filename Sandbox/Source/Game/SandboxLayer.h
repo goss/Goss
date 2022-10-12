@@ -23,7 +23,6 @@ private:
 	Ref<Shader> textureShader;
 
 	Ref<VertexArray> vertexArray;
-	Ref<VertexArray> squareVertexArray;
 	Ref<Texture2D> texture;
 
 	OrthographicCameraController cameraController;

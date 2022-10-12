@@ -41,7 +41,6 @@ namespace Goss
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
-
 	OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, const uint32_t count)
 		: count(count)
 	{

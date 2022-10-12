@@ -1,8 +1,7 @@
-#include "gepch.h"
+﻿#include "gepch.h"
 #include "OpenGLShader.h"
 
 #include "Core.h"
-#include "Timer.h"
 
 #include <glad/glad.h>
 #include <gtc/type_ptr.hpp>
@@ -11,34 +10,25 @@
 #include <spirv_cross/spirv_cross.hpp>
 #include <spirv_cross/spirv_glsl.hpp>
 
+#include "OpenGLUniformBuffer.h"
+
 namespace Goss
 {
 	namespace Utils 
 	{
-		static GLenum ShaderTypeFromString(const std::string& type)
+		static const char* GetShaderCompiledDirectory()
 		{
-			if (type == "vertex")
-				return GL_VERTEX_SHADER;
-			if (type == "fragment" || type == "pixel")
-				return GL_FRAGMENT_SHADER;
-
-			GE_CORE_ASSERT(false, "Unknown shader type!")
-			return 0;
+			return "Assets/Shaders/Compiled/OpenGL/";
 		}
 
-		static shaderc_shader_kind GLShaderStageToShaderC(const GLenum stage)
+		static void CreateCompileDirectoryIfNeeded()
 		{
-			switch (stage)
-			{
-				case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
-				case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
-				default: ;
-			}
-			GE_CORE_ASSERT(false)
-			return static_cast<shaderc_shader_kind>(0);
+			const std::string cacheDirectory = GetShaderCompiledDirectory();
+			if (!std::filesystem::exists(cacheDirectory))
+				std::filesystem::create_directories(cacheDirectory);
 		}
 
-		static const char* GLShaderStageToString(const GLenum stage)
+		static const char* GLShaderStageToString(const GLuint stage)
 		{
 			switch (stage)
 			{
@@ -50,36 +40,12 @@ namespace Goss
 			return nullptr;
 		}
 
-		static const char* GetCacheDirectory()
-		{
-			return "Assets/Cache/Shader/OpenGL";
-		}
-
-		static void CreateCacheDirectoryIfNeeded()
-		{
-			const std::string cacheDirectory = GetCacheDirectory();
-			if (!std::filesystem::exists(cacheDirectory))
-				std::filesystem::create_directories(cacheDirectory);
-		}
-
-		static const char* GLShaderStageCachedOpenGLFileExtension(const uint32_t stage)
+		static const char* GLShaderStageFileExtension(const uint32_t stage)
 		{
 			switch (stage)
 			{
-				case GL_VERTEX_SHADER:    return ".cached_opengl.vert";
-				case GL_FRAGMENT_SHADER:  return ".cached_opengl.frag";
-				default: ;
-			}
-			GE_CORE_ASSERT(false)
-			return "";
-		}
-
-		static const char* GLShaderStageCachedVulkanFileExtension(const uint32_t stage)
-		{
-			switch (stage)
-			{
-				case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
-				case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
+				case GL_VERTEX_SHADER:    return ".vert.spv";
+				case GL_FRAGMENT_SHADER:  return ".frag.spv";
 				default: ;
 			}
 			GE_CORE_ASSERT(false)
@@ -87,51 +53,46 @@ namespace Goss
 		}
 	}
 
-	OpenGLShader::OpenGLShader(std::string filepath) : filePath(std::move(filepath))
+	OpenGLShader::OpenGLShader(std::string name) : shaderName(std::move(name))
 	{
-		GE_CORE_INFO(filePath);
-		Utils::CreateCacheDirectoryIfNeeded();
+		Utils::CreateCompileDirectoryIfNeeded();
 		{
-			const std::string source = ReadFile(filePath);
-			const auto shaderSources = PreProcess(source);
-			const Timer timer;
+			std::string vertexSrc = shaderName;
+			vertexSrc.append(Utils::GLShaderStageFileExtension(GL_VERTEX_SHADER));
 
-			CompileOrGetVulkanBinaries(shaderSources);
-			CompileOrGetOpenGLBinaries();
+			std::string fragmentSrc = shaderName;
+			fragmentSrc.append(Utils::GLShaderStageFileExtension(GL_FRAGMENT_SHADER));
 
+			const std::string vertSpv = ReadFile(vertexSrc);
+			const std::string fragSpv = ReadFile(fragmentSrc);
+
+			const std::unordered_map<GLuint, std::string> sources{{GL_VERTEX_SHADER, vertSpv}, {GL_FRAGMENT_SHADER, fragSpv}};
+
+			GetShaderBinaries(sources);
 			CreateProgram();
-			GE_CORE_WARN("Shader creation took {0} ms", timer.ElapsedMillis());
 		}
-
-		// Extract name from filepath
-		auto lastSlash = filePath.find_last_of("/\\");
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-		const auto lastDot = filePath.rfind('.');
-		const auto count = lastDot == std::string::npos ? filePath.size() - lastSlash : lastDot - lastSlash;
-		shaderName = filePath.substr(lastSlash, count);
 	}
 
 	OpenGLShader::OpenGLShader(std::string name, const std::string& vertexSrc, const std::string& fragmentSrc) : shaderName(std::move(name))
 	{
-		std::unordered_map<GLenum, std::string> sources;
-		sources[GL_VERTEX_SHADER] = vertexSrc;
-		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
+		const std::unordered_map<GLuint, std::string> sources{{GL_VERTEX_SHADER, vertexSrc}, {GL_FRAGMENT_SHADER, fragmentSrc}};
 
-		CompileOrGetVulkanBinaries(sources);
-		CompileOrGetOpenGLBinaries();
-
+		GetShaderBinaries(sources);
 		CreateProgram();
 	}
 
 	OpenGLShader::~OpenGLShader()
 	{
-		glDeleteProgram(rendererId);
+		glDeleteProgram(programId);
 	}
 
-	std::string OpenGLShader::ReadFile(const std::string& filepath)
+	std::string OpenGLShader::ReadFile(const std::string& name)
 	{
+		std::string location = Utils::GetShaderCompiledDirectory();
+		location.append(name);
+
 		std::string result;
-		std::ifstream stream(filepath, std::ios::in | std::ios::binary); 
+		std::ifstream stream(location, std::ios::in | std::ios::binary); 
 		if (stream)
 		{
 			stream.seekg(0, std::ios::end);
@@ -144,60 +105,28 @@ namespace Goss
 			}
 			else
 			{
-				GE_CORE_ERROR("Could not read from file '{0}'", filepath);
+				GE_CORE_ERROR("Could not read from file '{0}'", name);
 			}
 		}
 		else
 		{
-			GE_CORE_ERROR("Could not open file '{0}'", filepath);
+			GE_CORE_ERROR("Could not open file '{0}'", name);
 		}
 
 		return result;
 	}
 
-	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
+	void OpenGLShader::GetShaderBinaries(const std::unordered_map<GLuint, std::string>& sources)
 	{
-		std::unordered_map<GLenum, std::string> shaderSources;
+		const std::filesystem::path directory = Utils::GetShaderCompiledDirectory();
 
-		const char* typeToken = "#type";
-		const size_t typeTokenLength = strlen(typeToken);
-		size_t pos = source.find(typeToken, 0); //Start of shader type declaration line
-
-		while (pos != std::string::npos)
-		{
-			const size_t eol = source.find_first_of("\r\n", pos); //End of shader type declaration line
-			GE_CORE_ASSERT(eol != std::string::npos, "Syntax error")
-			const size_t begin = pos + typeTokenLength + 1; //Start of shader type name (after "#type " keyword)
-			std::string type = source.substr(begin, eol - begin);
-			GE_CORE_ASSERT(Utils::ShaderTypeFromString(type), "Invalid shader type specified")
-
-			const size_t nextLinePos = source.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
-			GE_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error")
-			pos = source.find(typeToken, nextLinePos); //Start of next shader type declaration line
-
-			shaderSources[Utils::ShaderTypeFromString(type)] = (pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
-		}
-
-		return shaderSources;
-	}
-
-	void OpenGLShader::CompileOrGetVulkanBinaries(const std::unordered_map<GLenum, std::string>& shaderSources)
-	{
-		shaderc::Compiler compiler{};
-		shaderc::CompileOptions options;
-		options.SetTargetEnvironment(shaderc_target_env_vulkan, shaderc_env_version_vulkan_1_2);
-		//options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
-		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
-
-		auto& shaderData = vulkanSpirv;
+		auto& shaderData = shaderSources;
 		shaderData.clear();
-		for (auto&& [stage, source] : shaderSources)
+		for (auto&& [stage, source] : sources)
 		{
-			std::filesystem::path shaderFilePath = filePath;
-			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedVulkanFileExtension(stage));
+			std::filesystem::path path = directory / (shaderName + Utils::GLShaderStageFileExtension(stage));
 
-			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
+			std::ifstream in(path, std::ios::in | std::ios::binary);
 			if (in.is_open())
 			{
 				in.seekg(0, std::ios::end);
@@ -208,85 +137,11 @@ namespace Goss
 				data.resize(size / sizeof(uint32_t));
 				in.read(reinterpret_cast<char*>(data.data()), size);
 			}
-			else
-			{
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), filePath.c_str(), options);
-				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
-				{
-					GE_CORE_ERROR(module.GetErrorMessage());
-					GE_CORE_ASSERT(false);
-				}
-
-				shaderData[stage] = std::vector<uint32_t>(module.cbegin(), module.cend());
-
-				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
-				if (out.is_open())
-				{
-					auto& data = shaderData[stage];
-					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
-					out.flush();
-					out.close();
-				}
-			}
 		}
 
-		for (auto&& [stage, data]: shaderData)
+		for (auto&& [stage, data]: shaderSources)
+		{
 			Reflect(stage, data);
-	}
-
-	void OpenGLShader::CompileOrGetOpenGLBinaries()
-	{
-		auto& shaderData = openGLSpirv;
-
-		shaderc::Compiler compiler{};
-		shaderc::CompileOptions options;
-		options.SetTargetEnvironment(shaderc_target_env_opengl, shaderc_env_version_opengl_4_5);
-		//options.SetOptimizationLevel(shaderc_optimization_level_performance);
-
-		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
-
-		shaderData.clear();
-		openGLSourceCode.clear();
-		for (auto&& [stage, spirv] : vulkanSpirv)
-		{
-			std::filesystem::path shaderFilePath = filePath;
-			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() + Utils::GLShaderStageCachedOpenGLFileExtension(stage));
-
-			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
-			if (in.is_open())
-			{
-				in.seekg(0, std::ios::end);
-				auto size = in.tellg();
-				in.seekg(0, std::ios::beg);
-
-				auto& data = shaderData[stage];
-				data.resize(size / sizeof(uint32_t));
-				in.read(reinterpret_cast<char*>(data.data()), size);
-			}
-			else
-			{
-				spirv_cross::CompilerGLSL glslCompiler(spirv);
-				openGLSourceCode[stage] = glslCompiler.compile();
-				auto& source = openGLSourceCode[stage];
-
-				shaderc::SpvCompilationResult module = compiler.CompileGlslToSpv(source, Utils::GLShaderStageToShaderC(stage), filePath.c_str());
-				if (module.GetCompilationStatus() != shaderc_compilation_status_success)
-				{
-					GE_CORE_ERROR(module.GetErrorMessage());
-					GE_CORE_ASSERT(false);
-				}
-
-				shaderData[stage] = std::vector(module.cbegin(), module.cend());
-
-				std::ofstream out(cachedPath, std::ios::out | std::ios::binary);
-				if (out.is_open())
-				{
-					auto& data = shaderData[stage];
-					out.write(reinterpret_cast<char*>(data.data()), data.size() * sizeof(uint32_t));
-					out.flush();
-					out.close();
-				}
-			}
 		}
 	}
 
@@ -295,12 +150,18 @@ namespace Goss
 		const GLuint program = glCreateProgram();
 
 		std::vector<GLuint> shaderIDs;
-		for (auto&& [stage, spirv] : openGLSpirv)
+		for (auto&& [stage, spirv] : shaderSources)
 		{
 			GLuint shaderId = shaderIDs.emplace_back(glCreateShader(stage));
 			glShaderBinary(1, &shaderId, GL_SHADER_BINARY_FORMAT_SPIR_V, spirv.data(), spirv.size() * sizeof(uint32_t));
 			glSpecializeShader(shaderId, "main", 0, nullptr, nullptr);
-			glAttachShader(program, shaderId);
+
+			GLint compiled = 0;
+			glGetShaderiv(shaderId, GL_COMPILE_STATUS, &compiled);
+			if(compiled == GL_TRUE)
+			{
+				glAttachShader(program, shaderId);
+			}
 		}
 
 		glLinkProgram(program);
@@ -314,12 +175,14 @@ namespace Goss
 
 			std::vector<GLchar> infoLog(maxLength);
 			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.data());
-			GE_CORE_ERROR("Shader linking failed ({0}):\n{1}", filePath, infoLog.data());
+			GE_CORE_ERROR("Shader linking failed ({0}):\n{1}", shaderName, infoLog.data());
 
 			glDeleteProgram(program);
 
 			for (const auto id : shaderIDs)
+			{
 				glDeleteShader(id);
+			}
 		}
 
 		for (const auto id : shaderIDs)
@@ -328,15 +191,15 @@ namespace Goss
 			glDeleteShader(id);
 		}
 
-		rendererId = program;
+		programId = program;
 	}
 
-	void OpenGLShader::Reflect(const GLenum stage, const std::vector<uint32_t>& shaderData)
+	void OpenGLShader::Reflect(const GLuint stage, const std::vector<uint32_t>& shaderData)
 	{
 		const spirv_cross::Compiler compiler(shaderData);
 		spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
-		GE_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", Utils::GLShaderStageToString(stage), filePath);
+		GE_CORE_TRACE("OpenGLShader::Reflect - {0} {1}", Utils::GLShaderStageToString(stage), shaderName);
 		GE_CORE_TRACE("    {0} uniform buffers", resources.uniform_buffers.size());
 		GE_CORE_TRACE("    {0} resources", resources.sampled_images.size());
 
@@ -357,7 +220,7 @@ namespace Goss
 
 	void OpenGLShader::Bind() const
 	{
-		glUseProgram(rendererId);
+		glUseProgram(programId);
 	}
 
 	void OpenGLShader::Unbind() const
@@ -402,50 +265,79 @@ namespace Goss
 
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int value) const
 	{
-		const GLint location = glGetUniformLocation(rendererId, name.c_str());
+		const GLint location = glGetUniformLocation(programId, name.c_str());
 		glUniform1i(location, value);
 	}
 
 	void OpenGLShader::UploadUniformIntArray(const std::string& name, const int* values, const uint32_t count) const
 	{
-		const GLint location = glGetUniformLocation(rendererId, name.c_str());
+		const GLint location = glGetUniformLocation(programId, name.c_str());
 		glUniform1iv(location, static_cast<GLsizei>(count), values);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, const float value) const
 	{
-		const GLint location = glGetUniformLocation(rendererId, name.c_str());
+		const GLint location = glGetUniformLocation(programId, name.c_str());
 		glUniform1f(location, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value) const
 	{
-		const GLint location = glGetUniformLocation(rendererId, name.c_str());
+		const GLint location = glGetUniformLocation(programId, name.c_str());
 		glUniform2f(location, value.x, value.y);
 	}
 
 	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value) const
 	{
-		const GLint location = glGetUniformLocation(rendererId, name.c_str());
+		const GLint location = glGetUniformLocation(programId, name.c_str());
 		glUniform3f(location, value.x, value.y, value.z);
 	}
 
 	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value) const
 	{
-		const GLint location = glGetUniformLocation(rendererId, name.c_str());
+		const GLint location = glGetUniformLocation(programId, name.c_str());
 		glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
 
 	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const
 	{
-		const GLint location = glGetUniformLocation(rendererId, name.c_str());
-		glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+		const GLint location = glGetUniformLocation(programId, name.c_str());
+		glUniformMatrix3fv(location, 1, GL_FALSE, value_ptr(matrix));
 	}
 
 	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const
 	{
-		const GLint location = glGetUniformLocation(rendererId, name.c_str());
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
+		const GLint location = glGetUniformLocation(programId, name.c_str());
+		glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(matrix));
 	}
 
+	void OpenGLShader::SetColor(const glm::vec4& value)
+	{
+		const GLuint blockIndex = glGetUniformBlockIndex(programId, "UniformBuffer");
+
+		GLint blockSize;
+		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
+		glUniformBlockBinding(programId, blockIndex, 0);
+
+		const GLfloat color[] = {value.x, value.y, value.z, value.w};
+		GLubyte* blockBuffer = static_cast<GLubyte*>(malloc(blockSize));
+		memcpy(blockBuffer, color, 16);
+
+		unsigned int ubo;
+		glGenBuffers(1, &ubo);
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+		glBufferData(GL_UNIFORM_BUFFER, 16, nullptr, GL_STATIC_DRAW); // allocate 16 bytes of memory
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
+
+		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, 16, blockBuffer); 
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+		//const Ref<UniformBuffer> uniformBuffer = UniformBuffer::Create(blockSize, blockIndex);
+		//uniformBuffer->SetData(blockBuffer, blockSize, 0);
+
+		free(blockBuffer);
+	}
 }

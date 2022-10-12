@@ -127,8 +127,8 @@ project "Engine"
 
 	postbuildcommands
 	{
-		("call $(SolutionDir)Build\\Batch\\CompileShaders.bat -$(ProjectDir)Assets\\Shaders");
-		("{COPY} %{cfg.buildtarget.relpath} ../Bin/" .. outputdir .. "/Sandbox");
+		("call $(SolutionDir)Build\\Batch\\PostBuildCompileShaders.bat -$(ProjectDir)Assets\\Shaders");
+		--("{COPY} %{cfg.buildtarget.relpath} ../Bin/" .. outputdir .. "/Sandbox");
 	}
 
 	filter "system:windows"
@@ -136,8 +136,9 @@ project "Engine"
 		
 	filter "configurations:Debug"
 		defines "GE_DEBUG"
-		symbols "On"
+		symbols "on"
 		runtime "Debug"
+		staticruntime "off"
 		
 		links
 		{
@@ -149,7 +150,8 @@ project "Engine"
 	filter "configurations:Release"
 		defines "GE_RELEASE"
 		runtime "Release"
-		optimize "On"
+		optimize "on"
+		staticruntime "on"
 		
 		links
 		{
@@ -164,7 +166,6 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "off"
 	
 	targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/intermediates/" .. outputdir .. "/%{prj.name}")
@@ -190,8 +191,8 @@ project "Sandbox"
 		"%{IncludeDir.EngineInterface}",
 
 		--"%{IncludeDir.VulkanSDK}",
-		--"%{IncludeDir.GLAD}",
-		--"%{IncludeDir.GLFW}",
+		"%{IncludeDir.GLAD}",
+		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLM}",
 		"%{IncludeDir.SPDLOG}",
 		"%{IncludeDir.STB_IMAGE}",
@@ -204,7 +205,7 @@ project "Sandbox"
 
 	postbuildcommands
 	{
-		("call $(SolutionDir)Build\\Batch\\CompileShaders.bat -$(ProjectDir)Assets\\Shaders");
+		("call $(SolutionDir)Build\\Batch\\PostBuildCompileShaders.bat -$(ProjectDir)Assets\\Shaders");
 	}
 
 	filter "system:windows"
@@ -213,9 +214,11 @@ project "Sandbox"
 	filter "configurations:Debug"
 		defines "GE_DEBUG"
 		runtime "Debug"
-		symbols "On"
+		symbols "on"
+		staticruntime "off"
 
 	filter "configurations:Release"
 		defines "GE_RELEASE"
 		runtime "Release"
-		optimize "On"
+		optimize "on"
+		staticruntime "on"

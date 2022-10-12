@@ -1,9 +1,8 @@
 #include "gepch.h"
-#include "Runtime/RenderAPI/OpenGL/Public/OpenGLRendererAPI.h"
+#include "OpenGLRendererAPI.h"
+#include "Core.h"
 
 #include <glad/glad.h>
-
-#include "Core.h"
 
 namespace Goss
 {
