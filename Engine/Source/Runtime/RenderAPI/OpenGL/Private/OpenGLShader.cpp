@@ -18,7 +18,7 @@ namespace Goss
 	{
 		static const char* GetShaderCompiledDirectory()
 		{
-			return "Assets/Shaders/Compiled/OpenGL/";
+			return "Assets/Shaders/Compiled/";
 		}
 
 		static void CreateCompileDirectoryIfNeeded()
@@ -264,96 +264,84 @@ namespace Goss
 
 	void OpenGLShader::UploadUniformInt(const std::string& name, const int value) const
 	{
-		const GLint location = glGetUniformLocation(programId, name.c_str());
+		const GLint location = GetUniformLocation(name);
 		glUniform1i(location, value);
 	}
 
 	void OpenGLShader::UploadUniformIntArray(const std::string& name, const int* values, const uint32_t count) const
 	{
-		const GLint location = glGetUniformLocation(programId, name.c_str());
+		const GLint location = GetUniformLocation(name);
 		glUniform1iv(location, static_cast<GLsizei>(count), values);
 	}
 
 	void OpenGLShader::UploadUniformFloat(const std::string& name, const float value) const
 	{
-		const GLint location = glGetUniformLocation(programId, name.c_str());
+		const GLint location = GetUniformLocation(name);
 		glUniform1f(location, value);
 	}
 
 	void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& value) const
 	{
-		const GLint location = glGetUniformLocation(programId, name.c_str());
+		const GLint location = GetUniformLocation(name);
 		glUniform2f(location, value.x, value.y);
 	}
 
 	void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& value) const
 	{
-		const GLint location = glGetUniformLocation(programId, name.c_str());
+		const GLint location = GetUniformLocation(name);
 		glUniform3f(location, value.x, value.y, value.z);
 	}
 
 	void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& value) const
 	{
-		const GLint location = glGetUniformLocation(programId, name.c_str());
+		const GLint location = GetUniformLocation(name);
 		glUniform4f(location, value.x, value.y, value.z, value.w);
 	}
 
 	void OpenGLShader::UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const
 	{
-		const GLint location = glGetUniformLocation(programId, name.c_str());
+		const GLint location = GetUniformLocation(name);
 		glUniformMatrix3fv(location, 1, GL_FALSE, value_ptr(matrix));
 	}
 
 	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const
 	{
-		const GLint location = glGetUniformLocation(programId, name.c_str());
+		const GLint location = GetUniformLocation(name);
 		glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(matrix));
+	}
+
+	GLint OpenGLShader::GetUniformLocation(const std::string& name) const
+	{
+		if(uniformLocations.find(name) != uniformLocations.end())
+		{
+			return uniformLocations[name];
+		}
+
+		const GLint location = glGetUniformLocation(programId, name.c_str());
+		uniformLocations[name] = location;
+		return location;
 	}
 
 	void OpenGLShader::SetColor(const glm::vec4& value)
 	{
-		const GLuint blockIndex = glGetUniformBlockIndex(programId, "UniformBuffer");
+		constexpr int size =  sizeof(glm::vec4);
 
-		GLint blockSize;
-		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-		//glUniformBlockBinding(programId, blockIndex, 0);
-
-		constexpr int size =  sizeof(value);
-
-		unsigned int ubo;
-		glGenBuffers(1, &ubo);
-		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-		glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_STATIC_DRAW); 
-
-		glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, size, value_ptr(value)); 
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-		//const Ref<UniformBuffer> uniformBuffer = UniformBuffer::Create(blockSize, blockIndex);
-		//uniformBuffer->SetData(blockBuffer, blockSize, 0);
+		if(colorUniformBuffer == nullptr)
+		{
+			colorUniformBuffer = UniformBuffer::Create(size, 0);
+		}
+		colorUniformBuffer->SetData(value_ptr(value), size, 0);
 	}
 
 	void OpenGLShader::SetTransformAndViewMatrix(const glm::mat4& viewProjection, const glm::mat4& position)
 	{
-		const GLuint blockIndex = glGetUniformBlockIndex(programId, "ViewMatrixBuffer");
-
-		GLint blockSize;
-		glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize);
-		//glUniformBlockBinding(programId, blockIndex, 1);
-
 		constexpr int size =  sizeof(glm::mat4);
 
-		unsigned int ubo;
-		glGenBuffers(1, &ubo);
-		glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-		glBufferData(GL_UNIFORM_BUFFER, static_cast<GLsizeiptr>(2) * size, nullptr, GL_STATIC_DRAW);
-
-		glBindBufferBase(GL_UNIFORM_BUFFER, 1, ubo);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, size, value_ptr(viewProjection));
-		glBufferSubData(GL_UNIFORM_BUFFER, size, size, value_ptr(position));
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-		//const Ref<UniformBuffer> uniformBuffer = UniformBuffer::Create(blockSize, blockIndex);
-		//uniformBuffer->SetData(blockBuffer, blockSize, 0);
+		if(matrixUniformBuffer == nullptr)
+		{
+			matrixUniformBuffer = UniformBuffer::Create(static_cast<GLsizeiptr>(2) * size, 1);
+		}
+		matrixUniformBuffer->SetData(value_ptr(viewProjection), size, 0);
+		matrixUniformBuffer->SetData(value_ptr(position), size, size);
 	}
 }

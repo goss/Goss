@@ -3,12 +3,12 @@
 layout(location = 0) in vec3 position;
 layout(location = 0) out vec4 fragColor;
 
-layout(binding = 0, std140) uniform UniformBuffer 
+layout(set = 0, binding = 0, std140) uniform UniformBuffer 
 {
 	vec4 color;
 };
 
-layout(binding = 1, std140) uniform ViewMatrixBuffer 
+layout(set = 1, binding = 1, std140) uniform ViewMatrixBuffer 
 {
 	mat4 viewProjection;
 	mat4 transform;

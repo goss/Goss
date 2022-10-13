@@ -5,6 +5,9 @@
 
 namespace Goss
 {
+	 /**
+	 * Vertex Buffer
+	 */
 	OpenGLVertexBuffer::OpenGLVertexBuffer(const uint32_t size)
 	{
 		glCreateBuffers(1, &rendererId);
@@ -31,7 +34,6 @@ namespace Goss
 
 	void OpenGLVertexBuffer::Unbind() const
 	{
-
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
@@ -41,6 +43,9 @@ namespace Goss
 		glBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	}
 
+	/**
+	 * Index Buffer
+	 */
 	OpenGLIndexBuffer::OpenGLIndexBuffer(const uint32_t* indices, const uint32_t count)
 		: count(count)
 	{
@@ -66,5 +71,4 @@ namespace Goss
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
-
 }

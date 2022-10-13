@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include <glm.hpp>
 
+#include "UniformBuffer.h"
 #include "glad/glad.h"
 
 namespace Goss
@@ -44,16 +45,24 @@ private:
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix) const;
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix) const;
 
+		GLint GetUniformLocation(const std::string& name) const;
+
 		static std::string ReadFile(const std::string& name);
 
 		void GetShaderBinaries(const std::unordered_map<GLuint, std::string>& sources);
 		void CreateProgram();
 		void Reflect(GLuint stage, const std::vector<uint32_t>& shaderData);
 
+		mutable std::unordered_map<std::string, GLint> uniformLocations;
+
 		uint32_t programId;
 		std::string shaderName;
 
 		std::unordered_map<GLuint, std::vector<uint32_t>> shaderSources;
+
+		// TODO combine buffers?
+		Ref<UniformBuffer> colorUniformBuffer; 
+		Ref<UniformBuffer> matrixUniformBuffer;
 	};
 
 }
