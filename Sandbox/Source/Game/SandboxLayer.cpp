@@ -1,4 +1,5 @@
 #include "SandboxLayer.h"
+#include "LuaTest.h"
 
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
@@ -37,6 +38,8 @@ SandboxLayer::SandboxLayer()
 	//textureShader->SetInt("u_Texture", 0);
 
 	//texture = Texture2D::Create("Assets/Textures/Checkerboard.png");
+
+	LuaTest::Run();
 }
 
 void SandboxLayer::OnAttach()
@@ -58,6 +61,8 @@ void SandboxLayer::Tick(const Timestep timestep)
 	static float angle = 0;
 	angle += 0.001f * timestep.GetMilliseconds();
 	const auto mat = rotate(transform, angle, glm::vec3(0, 0, 1));
+
+	glm::vec3 pos = glm::vec3(1, 1, 1);
 
 	Renderer::BeginScene(cameraController.GetCamera());
 

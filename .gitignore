@@ -369,5 +369,8 @@ FodyWeavers.xsd
 *.sln
 *.hint
 
-Engine/ThirdParty
+#Engine/ThirdParty
 !*.lua
+
+
+

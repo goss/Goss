@@ -22,9 +22,12 @@ IncludeDir["EngineCore"] = 				"%{wks.location}/Engine/Source/Runtime/Core/Publi
 IncludeDir["EngineEvents"] = 			"%{wks.location}/Engine/Source/Runtime/Events/Public"
 IncludeDir["EngineGameframework"] = 	"%{wks.location}/Engine/Source/Runtime/GameFramework/Public"
 IncludeDir["EnginePlatformWindows"] = 	"%{wks.location}/Engine/Source/Runtime/Platform/Windows/Public"
+IncludeDir["EngineScripting"] = 		"%{wks.location}/Engine/Source/Runtime/Scripting/Public"
+--RenderAPI
 IncludeDir["EngineInterface"] = 		"%{wks.location}/Engine/Source/Runtime/RenderAPI/Interface/Public"
 IncludeDir["EngineOpenGL"] = 			"%{wks.location}/Engine/Source/Runtime/RenderAPI/OpenGL/Public"
 IncludeDir["EngineVulkan"] = 			"%{wks.location}/Engine/Source/Runtime/RenderAPI/Vulkan/Public"
+
 
 IncludeDir["VulkanSDK"] = 				"%{VULKAN_SDK}/Include"
 IncludeDir["GLAD"] = 					"%{wks.location}/Engine/ThirdParty/glad/include"
@@ -32,11 +35,15 @@ IncludeDir["GLFW"] = 					"%{wks.location}/Engine/ThirdParty/glfw/include"
 IncludeDir["GLM"] = 					"%{wks.location}/Engine/ThirdParty/glm/glm"
 IncludeDir["SPDLOG"] = 					"%{wks.location}/Engine/ThirdParty/spdlog/include"
 IncludeDir["STB_IMAGE"] = 				"%{wks.location}/Engine/ThirdParty/stb_image"
+IncludeDir["lua"] = 					"%{wks.location}/Engine/ThirdParty/lua542"
 
 LibraryDir = {}
 LibraryDir["VulkanSDK"] = 				"%{VULKAN_SDK}/Lib"
 
 Library = {}
+
+Library["Lua"] = 						"%{wks.location}/Engine/ThirdParty/lua542/lua54.lib"
+
 Library["Vulkan"] = 					"%{LibraryDir.VulkanSDK}/vulkan-1.lib"
 Library["VulkanUtils"] = 				"%{LibraryDir.VulkanSDK}/VkLayer_utils.lib"
 
@@ -62,7 +69,7 @@ project "Engine"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "off"
+	--staticruntime "off"
 
 	targetdir ("%{wks.location}/Bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("%{wks.location}/Intermediates/" .. outputdir .. "/%{prj.name}")
@@ -99,6 +106,7 @@ project "Engine"
 		"%{IncludeDir.EngineEvents}",
 		"%{IncludeDir.EngineGameframework}",
 		"%{IncludeDir.EnginePlatformWindows}",
+		"%{IncludeDir.EngineScripting}",
 		"%{IncludeDir.EngineInterface}",
 		"%{IncludeDir.EngineOpenGL}",
 		"%{IncludeDir.EngineVulkan}",
@@ -109,12 +117,15 @@ project "Engine"
 		"%{IncludeDir.GLM}",
 		"%{IncludeDir.SPDLOG}",
 		"%{IncludeDir.STB_IMAGE}",
+		"%{IncludeDir.lua}",
 	}
 	
 	links
 	{
 		--"opengl32.lib",
 		"%{Library.Vulkan}",
+		"%{Library.Lua}",
+
 		"GLFW", --project ThirdParty/glfw
 		"GLAD", --project ThirdParty/glad
 	}
@@ -180,6 +191,9 @@ project "Sandbox"
 		"%{prj.name}/Assets/Shaders/**.glsl",
 		"%{prj.name}/Assets/Shaders/**.vert",
 		"%{prj.name}/Assets/Shaders/**.frag",
+
+		--lua
+		"%{prj.name}/Assets/Lua/**.lua",
 	}
 
 	includedirs
@@ -189,6 +203,7 @@ project "Sandbox"
 		"%{IncludeDir.EngineEvents}",
 		"%{IncludeDir.EngineGameframework}",
 		"%{IncludeDir.EngineInterface}",
+		"%{IncludeDir.EngineScripting}",
 
 		--"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.GLAD}",
@@ -196,6 +211,7 @@ project "Sandbox"
 		"%{IncludeDir.GLM}",
 		"%{IncludeDir.SPDLOG}",
 		"%{IncludeDir.STB_IMAGE}",
+		"%{IncludeDir.lua}",
 	}
 
 	links
