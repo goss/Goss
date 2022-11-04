@@ -18,12 +18,11 @@ namespace Goss
 	{
 		const float a = static_cast<float>(lua_tonumber(state, 1));
 		const float b = static_cast<float>(lua_tonumber(state, 2));
-		std::cout << "[cpp] HostFunction(" << a << ", " << b << ") called from Lua" << std::endl;
+		std::cout << "[cpp] HostFunction(" << a << ", " << b << ")" << std::endl;
 		const float c = a * b;
 		lua_pushnumber(state, c);
 		return 1;
 	}
-
 
 	void LuaTest::Run()
 	{
@@ -90,8 +89,7 @@ namespace Goss
 			{
 				lua_pushnumber(luaState, 5.0f);
 				lua_pushnumber(luaState, 6.0f);
-				lua_pushstring(luaState, "Bwa ha ha!");
-				if (CheckLua(luaState, lua_pcall(luaState, 3, 1, 0)))
+				if (CheckLua(luaState, lua_pcall(luaState, 2, 1, 0)))
 				{
 					std::cout << "[lua Func] returned " << static_cast<float>(lua_tonumber(luaState, -1)) << std::endl << std::endl;
 				}
